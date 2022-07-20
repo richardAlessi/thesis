@@ -24,7 +24,37 @@ randomAllocation <- function(n, T){
 
 # Simple allocation based off Neyman Allocation
 neymanKnown <- function(n, T, Results, p){
-  Allocation = sample(T, n, replace = TRUE, prob = p)
+  q = 1 - p
+  denom = sum(sqrt(p*q))
+  p_calc = sqrt(p*q)/denom
+  Allocation = sample(T, n, replace = TRUE, prob = p_calc)
+  return(Allocation)
+}
+
+# Simple allocation based off RSIHR Allocation
+RSIHRKnown <- function(n, T, Results, p){
+  denom = sum(sqrt(p))
+  p_calc = sqrt(p)/denom
+  Allocation = sample(T, n, replace = TRUE, prob = p_calc)
+  return(Allocation)
+}
+
+# Simple allocation based off Rosenberger Allocation
+RosenbergerKnown <- function(n, T, Results, p){
+  q = 1 - p
+  denom = sum(p/q)
+  p_calc = p/(q*denom)
+  Allocation = sample(T, n, replace = TRUE, prob = p_calc)
+  return(Allocation)
+}
+
+
+# Simple allocation based off Optimal adjusted
+OptimalAdjustedKnown <- function(n, T, Results, p){
+  q = 1 - p
+  denom = sum(sqrt(p)*q)
+  p_calc = sqrt(p)*q/denom
+  Allocation = sample(T, n, replace = TRUE, prob = p_calc)
   return(Allocation)
 }
 
@@ -110,7 +140,14 @@ playTheWinnerRandomised_2T <- function(n, Results, wA, wB){
   return(CombinedResult)
 }
 
-GittinsIndex <- function(n, Results, wA, wB){
+playTheWinnerRandomised <- function(n, Results, wA, wB){
+  Allocation = rep(0,n)
+  q = rep(0,n)
+  
+  return(Allocation)
+}
+
+GittinsIndex <- function(n, T, Results){
   Allocation = rep(0,n)
   G = rep(0,n)
   
@@ -119,7 +156,7 @@ GittinsIndex <- function(n, Results, wA, wB){
 }
 ```
 
-### Sequential estimation techniques
+### Sequential estimation techniques Two Treatments
 ```{r}
 
 
@@ -211,6 +248,96 @@ ResponseAdaptive_Binary_2 <- function(n, n0, Results){
 }
 ```
 
+### Sequential estimation techniques Multiple Treatments - simple extensions
+```{r}
+
+neymanEstimated_multiple <- function(n, n0, T, Results){
+  Allocation = rep(0,n)
+  p = rep(0,T)
+  q = rep(0,T)
+  
+  #First initialise by assigning no to each treatment
+  for (t in 1:T) {
+    Allocation[(n0*(t-1)+1):(t*n0)] = t
+  }
+
+    
+  for (i in (T*n0+1):n) {
+    for (j in 1:T) {
+    p[j] = mean(Results[Allocation[1:(i-1)] == 1 ,j])
+    q[j] = 1 - p[j]
+    }
+    denom = sum(sqrt(p*q))
+    p_calc = sqrt(p*q)/denom
+    Allocation[i] = sample(T,1, replace = TRUE, prob = p_calc)
+  }
+  return(Allocation)
+}
+
+RSIHR_multiple <- function(n, n0, T, Results){
+  Allocation = rep(0,n)
+  p = rep(0,T)
+  
+  #First initialise by assigning no to each treatment
+  
+   for (t in 1:T) {
+    Allocation[(n0*(t-1)+1):(t*n0)] = t
+  }
+  
+  for (i in (T*n0+1):n) {
+    for (j in 1:T) {
+      p[j] = mean(Results[Allocation[1:(i-1)] == 1 ,j])
+    }
+    denom = sum(sqrt(p))
+    p_calc = sqrt(p)/denom
+    Allocation[i] = sample(T,1, replace = TRUE, prob = p_calc)
+  }
+  return(Allocation)
+}
+
+Rosenberger_multiple <- function(n, n0, T, Results){
+  Allocation = rep(0,n)
+  p = rep(0,T)
+  q = rep(0,T)
+  
+  for (t in 1:T) {
+    Allocation[(n0*(t-1)+1):(t*n0)] = t
+  }
+  
+  for (i in (T*n0+1):n) {
+    for (j in 1:T) {
+      p[j] = mean(Results[Allocation[1:(i-1)] == 1 ,j])
+      q[j] = 1 - p[j]
+    }
+    denom = sum(p/q)
+    p_calc = p/(q*denom)
+    Allocation = sample(T, n, replace = TRUE, prob = p_calc)
+  }
+  return(Allocation)
+}
+
+OptimalAdjusted_multiple <- function(n, n0, Results){
+  Allocation = rep(0,n)
+  p = rep(0,T)
+  q = rep(0,T)
+  
+  #First initialise by assigning no to each treatment
+     for (t in 1:T) {
+    Allocation[(n0*(t-1)+1):(t*n0)] = t
+  }
+  
+  for (i in (T*n0+1):n) {
+    for (j in 1:T) {
+      p[j] = mean(Results[Allocation[1:(i-1)] == 1 ,j])
+      q[j] = 1 - p[j]
+    }
+    denom = sum(sqrt(p)*q)
+    p_calc = sqrt(p)*q/denom
+    Allocation = sample(T, n, replace = TRUE, prob = p_calc)
+  }
+  return(Allocation)
+}
+```
 
 
 ## Allocation strategies that take into account covariates
