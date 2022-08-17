@@ -1763,6 +1763,13 @@ pre code {
 
 
 <!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKFwiLi9IZWxwZXJzL0luaXRpYWxpc2UuUlwiKVxuYGBgIn0= -->
+<pre class="r"><code>source(&quot;./Helpers/Initialise.R&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <div id="allocation-methods" class="section level1">
 <h1>Allocation methods</h1>
 <p>Let us start by defining functions for each allocation method</p>
@@ -1817,11 +1824,11 @@ source(&quot;./Models/RA/11_gittinsIndex.R&quot;) # Not working yet
 <h3>Sequential estimation techniques Two Treatments</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKFwiLi9Nb2RlbHMvUkEvMTJfTmV5bWFuRXN0aW1hdGVkX2JpbmFyeS5SXCIpXG5zb3VyY2UoXCIuL01vZGVscy9SQS8xM19SU0lIUl9iaW5hcnkuUlwiKVxuc291cmNlKFwiLi9Nb2RlbHMvUkEvMTRfUm9zZW5iZXJnZXJfYmluYXJ5LlJcIilcbnNvdXJjZShcIi4vTW9kZWxzL1JBLzE1X09wdGltYWxBbGxvY2F0aW9uX2JpbmFyeS5SXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKFwiLi9Nb2RlbHMvUkEvMTJfTmV5bWFuRXN0aW1hdGVkX2JpbmFyeS5SXCIpXG5zb3VyY2UoXCIuL01vZGVscy9SQS8xM19SU0lIUl9iaW5hcnkuUlwiKVxuc291cmNlKFwiLi9Nb2RlbHMvUkEvMTRfUm9zZW5iZXJnZXJfYmluYXJ5LlJcIilcbnNvdXJjZShcIi4vTW9kZWxzL1JBLzE1X09wdGltYWxBZGp1c3RlZF9iaW5hcnkuUlwiKVxuYGBgIn0= -->
 <pre class="r"><code>source(&quot;./Models/RA/12_NeymanEstimated_binary.R&quot;)
 source(&quot;./Models/RA/13_RSIHR_binary.R&quot;)
 source(&quot;./Models/RA/14_Rosenberger_binary.R&quot;)
-source(&quot;./Models/RA/15_OptimalAllocation_binary.R&quot;)</code></pre>
+source(&quot;./Models/RA/15_OptimalAdjusted_binary.R&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1889,7 +1896,7 @@ SuccessProbs_Z = matrix(data = c(0.1, 0.3, 0.7, 0.1), nrow = 2, ncol = 2)</code>
 <p>Now we can model different treatment allocation strategies</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBSZXN1bHRzXG5UID0gbGVuZ3RoKFN1Y2Nlc3NQcm9icylcblJlc3VsdHMgPSBtYXRyaXgoMCwgbnJvdyA9IG4sIG5jb2wgPSBUKVxuXG5mb3IgKGkgaW4gMTpUKSB7XG4gIFJlc3VsdHNbICwgaV0gPSByYmlub20obiwgMSwgU3VjY2Vzc1Byb2JzW2ldKSBcbn1cblxuIyBSZXN1bHRzIG1lYXN1cmVzXG5zb3VyY2UoXCIuL1Jlc3VsdE1lYXN1cmVzL3N1Y2Nlc3NDb3VudC5SXCIpXG5cbmxpYnJhcnkocHdyKVxuXG5cbiMgUHVyZSByYW5kb21cbkFsbG9jYXRpb25fcmFuZG9tID0gcmFuZG9tQWxsb2NhdGlvbihuLCBUKVxuVG90YWxTdWNjZXNzZXNfUmFuZG9tID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fcmFuZG9tLCBSZXN1bHRzKVxuXG5oID0gU3VjY2Vzc1Byb2JzWzJdIC0gU3VjY2Vzc1Byb2JzWzFdXG5uMSA9IHN1bShBbGxvY2F0aW9uX3JhbmRvbSA9PSAxKVxubjIgPSBuIC0gbjFcbnBvd2VyID0gcHdyLjJwMm4udGVzdChoID0gaCwgbjEgPSAgbjEsIG4yID0gbjIsIHNpZy5sZXZlbD0wLjA1LCBhbHRlcm5hdGl2ZSA9IFwidHdvLnNpZGVkXCIpXG5cbiAgXG4jIEJpYXNlZCBDb2luXG5BbGxvY2F0aW9uX2JpYXNlZENvaW4gPSBiaWFzZWRDb2luQWxsb2NhdGlvbihuLCAxLzMpXG5Ub3RhbFN1Y2Nlc3Nlc19iaWFzZWRDb2luID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fYmlhc2VkQ29pbiwgUmVzdWx0cylcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBSZXN1bHRzXG5UID0gbGVuZ3RoKFN1Y2Nlc3NQcm9icylcblJlc3VsdHMgPSBtYXRyaXgoMCwgbnJvdyA9IG4sIG5jb2wgPSBUKVxuXG5mb3IgKGkgaW4gMTpUKSB7XG4gIFJlc3VsdHNbICwgaV0gPSByYmlub20obiwgMSwgU3VjY2Vzc1Byb2JzW2ldKSBcbn1cblxuIyBSZXN1bHRzIG1lYXN1cmVzXG5zb3VyY2UoXCIuL1Jlc3VsdE1lYXN1cmVzL3N1Y2Nlc3NDb3VudC5SXCIpXG5cbmxpYnJhcnkocHdyKVxuYGBgIn0= -->
 <pre class="r"><code># Results
 T = length(SuccessProbs)
 Results = matrix(0, nrow = n, ncol = T)
@@ -1901,10 +1908,13 @@ for (i in 1:T) {
 # Results measures
 source(&quot;./ResultMeasures/successCount.R&quot;)
 
-library(pwr)
-
-
-# Pure random
+library(pwr)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogcGFja2FnZSDigJhwd3LigJkgd2FzIGJ1aWx0IHVuZGVyIFIgdmVyc2lvbiA0LjEuM1xuIn0= -->
+<pre><code>Warning: package ‘pwr’ was built under R version 4.1.3</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBQdXJlIHJhbmRvbVxuQWxsb2NhdGlvbl9yYW5kb20gPSByYW5kb21BbGxvY2F0aW9uKG4sIFQpXG5Ub3RhbFN1Y2Nlc3Nlc19SYW5kb20gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9yYW5kb20sIFJlc3VsdHMpXG5cbmggPSBTdWNjZXNzUHJvYnNbMl0gLSBTdWNjZXNzUHJvYnNbMV1cbm4xID0gc3VtKEFsbG9jYXRpb25fcmFuZG9tID09IDEpXG5uMiA9IG4gLSBuMVxucG93ZXIgPSBwd3IuMnAybi50ZXN0KGggPSBoLCBuMSA9ICBuMSwgbjIgPSBuMiwgc2lnLmxldmVsPTAuMDUsIGFsdGVybmF0aXZlID0gXCJ0d28uc2lkZWRcIilcblxuICBcbiMgQmlhc2VkIENvaW5cbkFsbG9jYXRpb25fYmlhc2VkQ29pbiA9IGJpYXNlZENvaW4obiwgMS8zKVxuVG90YWxTdWNjZXNzZXNfYmlhc2VkQ29pbiA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX2JpYXNlZENvaW5bLDFdLCBSZXN1bHRzKVxuXG5gYGAifQ== -->
+<pre class="r"><code># Pure random
 Allocation_random = randomAllocation(n, T)
 TotalSuccesses_Random = successCount(Allocation_random, Results)
 
@@ -1915,43 +1925,179 @@ power = pwr.2p2n.test(h = h, n1 =  n1, n2 = n2, sig.level=0.05, alternative = &q
 
   
 # Biased Coin
-Allocation_biasedCoin = biasedCoinAllocation(n, 1/3)
-TotalSuccesses_biasedCoin = successCount(Allocation_biasedCoin, Results)</code></pre>
+Allocation_biasedCoin = biasedCoin(n, 1/3)
+TotalSuccesses_biasedCoin = successCount(Allocation_biasedCoin[,1], Results)
+</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gUmVzdWx0c1tpLCBBbGxvY2F0aW9uW2ldXSA6IGludmFsaWQgc3Vic2NyaXB0IHR5cGUgJ2xpc3QnXG4ifQ== -->
-<pre><code>Error in Results[i, Allocation[i]] : invalid subscript type &#39;list&#39;</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfT3B0aW1hbEFkanVzdGVkX2JpbmFyeSA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX09wdGltYWxBZGp1c3RlZF9iaW5hcnksIFJlc3VsdHMpXG5cbmBgYCJ9 -->
-<pre class="r"><code>TotalSuccesses_OptimalAdjusted_binary = successCount(Allocation_OptimalAdjusted_binary, Results)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBQbGF5IHRoZSB3aW5uZXJcbkFsbG9jYXRpb25fcGxheVRoZVdpbm5lciA9IHBsYXlUaGVXaW5uZXIobiwgVCwgUmVzdWx0cylcblRvdGFsU3VjY2Vzc2VzX3BsYXlUaGVXaW5uZXIgPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9wbGF5VGhlV2lubmVyLCBSZXN1bHRzKVxuXG5BbGxvY2F0aW9uX3BsYXlUaGVXaW5uZXJfUmFuZG9taXNlZCA9IHBsYXlUaGVXaW5uZXJSYW5kb21pc2VkXzJUKG4sIFJlc3VsdHMsIDEsIDEpXG5Ub3RhbFN1Y2Nlc3Nlc19wbGF5VGhlV2lubmVyX1JhbmRvbWlzZWQgPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9wbGF5VGhlV2lubmVyX1JhbmRvbWlzZWRbLDFdLCBSZXN1bHRzKVxuXG4jIE5leW1hbiBBbGxvY2F0aW9uc1xuQWxsb2NhdGlvbl9uZXlhbW5fa25vd24gPSBuZXltYW5Lbm93bihuLCBULCBSZXN1bHRzLCBTdWNjZXNzUHJvYnMpXG5Ub3RhbFN1Y2Nlc3Nlc19uZXlhbW5fa25vd24gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9uZXlhbW5fa25vd24sIFJlc3VsdHMpXG5cbkFsbG9jYXRpb25fUlNJSFJfa25vd24gPSBSU0lIUktub3duKG4sIFQsIFJlc3VsdHMsIFN1Y2Nlc3NQcm9icylcblRvdGFsU3VjY2Vzc2VzX1JTSUhSX2tub3duID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fUlNJSFJfa25vd24sIFJlc3VsdHMpXG5cbkFsbG9jYXRpb25fUm9zZW5iZXJnZXJfa25vd24gPSBSb3NlbmJlcmdlcktub3duKG4sIFQsIFJlc3VsdHMsIFN1Y2Nlc3NQcm9icylcblRvdGFsU3VjY2Vzc2VzX1Jvc2VuYmVyZ2VyX2tub3duID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fUm9zZW5iZXJnZXJfa25vd24sIFJlc3VsdHMpXG5cbkFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX2tub3duID0gT3B0aW1hbEFkanVzdGVkS25vd24obiwgVCwgUmVzdWx0cywgU3VjY2Vzc1Byb2JzKVxuVG90YWxTdWNjZXNzZXNfT3B0aW1hbEFkanVzdGVkX2tub3duID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX2tub3duLCBSZXN1bHRzKVxuXG5cbiMgRXN0aW1hdGVkIGFsbG9jYXRpb25zXG5BbGxvY2F0aW9uX25leWFtbl9lc3RpbWF0ZWQgPSBuZXltYW5Fc3RpbWF0ZWRfYmluYXJ5KG4sIG4wLCBSZXN1bHRzKVxuVG90YWxTdWNjZXNzZXNfbmV5YW1uX2VzdGltYXRlZCA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX25leWFtbl9lc3RpbWF0ZWQsIFJlc3VsdHMpXG5cbkFsbG9jYXRpb25fUlNISVJfYmluYXJ5ID0gUlNJSFJfYmluYXJ5KG4sIG4wLCBSZXN1bHRzKVxuVG90YWxTdWNjZXNzZXNfUlNISVJfYmluYXJ5ID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fUlNISVJfYmluYXJ5LCBSZXN1bHRzKVxuXG5BbGxvY2F0aW9uX1Jvc2VuYmVyZ2VyX2JpbmFyeSA9Um9zZW5iZXJnZXJfYmluYXJ5KG4sIG4wLCBSZXN1bHRzKVxuVG90YWxTdWNjZXNzZXNfUm9zZW5iZXJnZXJfYmluYXJ5ID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fUm9zZW5iZXJnZXJfYmluYXJ5LCBSZXN1bHRzKVxuXG5BbGxvY2F0aW9uX09wdGltYWxBZGp1c3RlZF9iaW5hcnkgPSBPcHRpbWFsQWRqdXN0ZWRfYmluYXJ5KG4sIG4wLCBSZXN1bHRzKVxuVG90YWxTdWNjZXNzZXNfT3B0aW1hbEFkanVzdGVkX2JpbmFyeSA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX09wdGltYWxBZGp1c3RlZF9iaW5hcnksIFJlc3VsdHMpXG5gYGAifQ== -->
+<pre class="r"><code># Play the winner
+Allocation_playTheWinner = playTheWinner(n, T, Results)
+TotalSuccesses_playTheWinner = successCount(Allocation_playTheWinner, Results)
+
+Allocation_playTheWinner_Randomised = playTheWinnerRandomised_2T(n, Results, 1, 1)
+TotalSuccesses_playTheWinner_Randomised = successCount(Allocation_playTheWinner_Randomised[,1], Results)
+
+# Neyman Allocations
+Allocation_neyamn_known = neymanKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_neyamn_known = successCount(Allocation_neyamn_known, Results)
+
+Allocation_RSIHR_known = RSIHRKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_RSIHR_known = successCount(Allocation_RSIHR_known, Results)
+
+Allocation_Rosenberger_known = RosenbergerKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_Rosenberger_known = successCount(Allocation_Rosenberger_known, Results)
+
+Allocation_OptimalAdjusted_known = OptimalAdjustedKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_OptimalAdjusted_known = successCount(Allocation_OptimalAdjusted_known, Results)
+
+
+# Estimated allocations
+Allocation_neyamn_estimated = neymanEstimated_binary(n, n0, Results)
+TotalSuccesses_neyamn_estimated = successCount(Allocation_neyamn_estimated, Results)
+
+Allocation_RSHIR_binary = RSIHR_binary(n, n0, Results)
+TotalSuccesses_RSHIR_binary = successCount(Allocation_RSHIR_binary, Results)
+
+Allocation_Rosenberger_binary =Rosenberger_binary(n, n0, Results)
+TotalSuccesses_Rosenberger_binary = successCount(Allocation_Rosenberger_binary, Results)
+
+Allocation_OptimalAdjusted_binary = OptimalAdjusted_binary(n, n0, Results)
+TotalSuccesses_OptimalAdjusted_binary = successCount(Allocation_OptimalAdjusted_binary, Results)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX2JpbmFyeSwgUmVzdWx0cykgOiBcbiAgb2JqZWN0ICdBbGxvY2F0aW9uX09wdGltYWxBZGp1c3RlZF9iaW5hcnknIG5vdCBmb3VuZFxuIn0= -->
-<pre><code>Error in successCount(Allocation_OptimalAdjusted_binary, Results) : 
-  object &#39;Allocation_OptimalAdjusted_binary&#39; not found</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfT3B0aW1hbEFkanVzdGVkX2JpbmFyeVxuXG5gYGAifQ== -->
-<pre class="r"><code>TotalSuccesses_OptimalAdjusted_binary
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9yYW5kb20pXG5gYGAifQ== -->
+<pre class="r"><code>table(Allocation_random)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQwNlxuIn0= -->
-<pre><code>[1] 406</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9yYW5kb21cbiAgMSAgIDIgXG41MjIgNDc4IFxuIn0= -->
+<pre><code>Allocation_random
+  1   2 
+522 478 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9iaWFzZWRDb2luWywxXSlcbmBgYCJ9 -->
+<pre class="r"><code>table(Allocation_biasedCoin[,1])</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG4gIDEgICAyIFxuNTAxIDQ5OSBcbiJ9 -->
+<pre><code>
+  1   2 
+501 499 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9wbGF5VGhlV2lubmVyKVxuYGBgIn0= -->
+<pre class="r"><code>table(Allocation_playTheWinner)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9wbGF5VGhlV2lubmVyXG4gIDEgICAyIFxuMzUzIDY0NyBcbiJ9 -->
+<pre><code>Allocation_playTheWinner
+  1   2 
+353 647 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9uZXlhbW5fa25vd24pXG5gYGAifQ== -->
+<pre class="r"><code>table(Allocation_neyamn_known)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9uZXlhbW5fa25vd25cbiAgMSAgIDIgXG40MzMgNTY3IFxuIn0= -->
+<pre><code>Allocation_neyamn_known
+  1   2 
+433 567 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9uZXlhbW5fZXN0aW1hdGVkKVxuYGBgIn0= -->
+<pre class="r"><code>table(Allocation_neyamn_estimated)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9uZXlhbW5fZXN0aW1hdGVkXG4gIDEgICAyIFxuNDQ4IDU1MiBcbiJ9 -->
+<pre><code>Allocation_neyamn_estimated
+  1   2 
+448 552 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9SU0hJUl9iaW5hcnkpXG5gYGAifQ== -->
+<pre class="r"><code>table(Allocation_RSHIR_binary)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9SU0hJUl9iaW5hcnlcbiAgMSAgIDIgXG4zNzIgNjI4IFxuIn0= -->
+<pre><code>Allocation_RSHIR_binary
+  1   2 
+372 628 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9iaW5hcnkpXG5gYGAifQ== -->
+<pre class="r"><code>table(Allocation_Rosenberger_binary)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9iaW5hcnlcbiAgMSAgIDIgXG4xNzMgODI3IFxuIn0= -->
+<pre><code>Allocation_Rosenberger_binary
+  1   2 
+173 827 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9PcHRpbWFsQWRqdXN0ZWRfYmluYXJ5KVxuYGBgIn0= -->
+<pre class="r"><code>table(Allocation_OptimalAdjusted_binary)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9PcHRpbWFsQWRqdXN0ZWRfYmluYXJ5XG4gIDEgICAyIFxuNTMwIDQ3MCBcbiJ9 -->
+<pre><code>Allocation_OptimalAdjusted_binary
+  1   2 
+530 470 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfUmFuZG9tXG5gYGAifQ== -->
+<pre class="r"><code>TotalSuccesses_Random</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM3NVxuIn0= -->
+<pre><code>[1] 375</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfYmlhc2VkQ29pblxuYGBgIn0= -->
+<pre class="r"><code>TotalSuccesses_biasedCoin</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM5NlxuIn0= -->
+<pre><code>[1] 396</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfcGxheVRoZVdpbm5lclxuYGBgIn0= -->
+<pre class="r"><code>TotalSuccesses_playTheWinner</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQ2MVxuIn0= -->
+<pre><code>[1] 461</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfcGxheVRoZVdpbm5lcl9SYW5kb21pc2VkXG5gYGAifQ== -->
+<pre class="r"><code>TotalSuccesses_playTheWinner_Randomised</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQ2N1xuIn0= -->
+<pre><code>[1] 467</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfbmV5YW1uX2tub3duXG5gYGAifQ== -->
+<pre class="r"><code>TotalSuccesses_neyamn_known</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQzNFxuIn0= -->
+<pre><code>[1] 434</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfbmV5YW1uX2VzdGltYXRlZFxuYGBgIn0= -->
+<pre class="r"><code>TotalSuccesses_neyamn_estimated</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQxMFxuIn0= -->
+<pre><code>[1] 410</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfUlNISVJfYmluYXJ5XG5gYGAifQ== -->
+<pre class="r"><code>TotalSuccesses_RSHIR_binary</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQ0OVxuIn0= -->
+<pre><code>[1] 449</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfUm9zZW5iZXJnZXJfYmluYXJ5XG5gYGAifQ== -->
+<pre class="r"><code>TotalSuccesses_Rosenberger_binary</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDUzNFxuIn0= -->
+<pre><code>[1] 534</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfT3B0aW1hbEFkanVzdGVkX2JpbmFyeVxuYGBgIn0= -->
+<pre class="r"><code>TotalSuccesses_OptimalAdjusted_binary</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM5NlxuIn0= -->
+<pre><code>[1] 396</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>setting up multi-treatment the problem</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubiA9IDEwMDAgIyBOdW1iZXIgb2Ygc3ViamVjdHNcbm4wID0gNVxuXG5aID0gcmJpbm9tKG4sMSwwLjUpICMgU2ltdWxhdGUgc2luZ2xlIGJpbmFyeSBjb3ZhcmlhdGVcblxuU3VjY2Vzc1Byb2JzID0gYygwLjIsIDAuNiwgMC44LCAwLjUsIDAuMilcblxuU3VjY2Vzc1Byb2JzX1ogPSBtYXRyaXgoZGF0YSA9IGMoMC4xLCAwLjMsIDAuNywgMC4xLCAwLjgsIDAuOCwgMC4yLCAwLjgsIDAuMTUsIDAuMjUpLCBucm93ID0gNSwgbmNvbCA9IDIpXG5cblQgPSA1XG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubiA9IDEwMDAgIyBOdW1iZXIgb2Ygc3ViamVjdHNcbm4wID0gMjBcblxuWiA9IHJiaW5vbShuLDEsMC41KSAjIFNpbXVsYXRlIHNpbmdsZSBiaW5hcnkgY292YXJpYXRlXG5cblN1Y2Nlc3NQcm9icyA9IGMoMC4yLCAwLjYsIDAuOCwgMC41LCAwLjIpXG5cblN1Y2Nlc3NQcm9ic19aID0gbWF0cml4KGRhdGEgPSBjKDAuMSwgMC4zLCAwLjcsIDAuMSwgMC44LCAwLjgsIDAuMiwgMC44LCAwLjE1LCAwLjI1KSwgbnJvdyA9IDUsIG5jb2wgPSAyKVxuXG4jIFJlc3VsdHNcblQgPSBsZW5ndGgoU3VjY2Vzc1Byb2JzKVxuUmVzdWx0cyA9IG1hdHJpeCgwLCBucm93ID0gbiwgbmNvbCA9IFQpXG5cbmZvciAoaSBpbiAxOlQpIHtcbiAgUmVzdWx0c1sgLCBpXSA9IHJiaW5vbShuLCAxLCBTdWNjZXNzUHJvYnNbaV0pIFxufVxuYGBgIn0= -->
 <pre class="r"><code>n = 1000 # Number of subjects
-n0 = 5
+n0 = 20
 
 Z = rbinom(n,1,0.5) # Simulate single binary covariate
 
@@ -1959,14 +2105,223 @@ SuccessProbs = c(0.2, 0.6, 0.8, 0.5, 0.2)
 
 SuccessProbs_Z = matrix(data = c(0.1, 0.3, 0.7, 0.1, 0.8, 0.8, 0.2, 0.8, 0.15, 0.25), nrow = 5, ncol = 2)
 
-T = 5</code></pre>
+# Results
+T = length(SuccessProbs)
+Results = matrix(0, nrow = n, ncol = T)
+
+for (i in 1:T) {
+  Results[ , i] = rbinom(n, 1, SuccessProbs[i]) 
+}</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBQdXJlIHJhbmRvbVxuQWxsb2NhdGlvbl9yYW5kb20gPSByYW5kb21BbGxvY2F0aW9uKG4sIFQpXG5Ub3RhbFN1Y2Nlc3Nlc19SYW5kb20gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9yYW5kb20sIFJlc3VsdHMpXG5cbmBgYCJ9 -->
+<pre class="r"><code># Pure random
+Allocation_random = randomAllocation(n, T)
+TotalSuccesses_Random = successCount(Allocation_random, Results)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBQbGF5IHRoZSB3aW5uZXJcbkFsbG9jYXRpb25fcGxheVRoZVdpbm5lciA9IHBsYXlUaGVXaW5uZXIobiwgVCwgUmVzdWx0cylcblRvdGFsU3VjY2Vzc2VzX3BsYXlUaGVXaW5uZXIgPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9wbGF5VGhlV2lubmVyLCBSZXN1bHRzKVxuXG5cbiMgTmV5bWFuIEFsbG9jYXRpb25zXG5BbGxvY2F0aW9uX25leWFtbl9rbm93biA9IG5leW1hbktub3duKG4sIFQsIFJlc3VsdHMsIFN1Y2Nlc3NQcm9icylcblRvdGFsU3VjY2Vzc2VzX25leWFtbl9rbm93biA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX25leWFtbl9rbm93biwgUmVzdWx0cylcblxuQWxsb2NhdGlvbl9SU0lIUl9rbm93biA9IFJTSUhSS25vd24obiwgVCwgUmVzdWx0cywgU3VjY2Vzc1Byb2JzKVxuVG90YWxTdWNjZXNzZXNfUlNJSFJfa25vd24gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9SU0lIUl9rbm93biwgUmVzdWx0cylcblxuQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9rbm93biA9IFJvc2VuYmVyZ2VyS25vd24obiwgVCwgUmVzdWx0cywgU3VjY2Vzc1Byb2JzKVxuVG90YWxTdWNjZXNzZXNfUm9zZW5iZXJnZXJfa25vd24gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9rbm93biwgUmVzdWx0cylcblxuQWxsb2NhdGlvbl9PcHRpbWFsQWRqdXN0ZWRfa25vd24gPSBPcHRpbWFsQWRqdXN0ZWRLbm93bihuLCBULCBSZXN1bHRzLCBTdWNjZXNzUHJvYnMpXG5Ub3RhbFN1Y2Nlc3Nlc19PcHRpbWFsQWRqdXN0ZWRfa25vd24gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9PcHRpbWFsQWRqdXN0ZWRfa25vd24sIFJlc3VsdHMpXG5cbkFsbG9jYXRpb25fbmV5YW1uX2VzdGltYXRlZCA9IG5leW1hbkVzdGltYXRlZF9tdWx0aXBsZShuLCBuMCwgVCwgUmVzdWx0cylcblRvdGFsU3VjY2Vzc2VzX25leWFtbl9lc3RpbWF0ZWQgPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9uZXlhbW5fZXN0aW1hdGVkLCBSZXN1bHRzKVxuXG5BbGxvY2F0aW9uX1JTSElSX211bHRpcGxlID0gUlNJSFJfbXVsdGlwbGUobiwgbjAsIFQsIFJlc3VsdHMpXG5Ub3RhbFN1Y2Nlc3Nlc19SU0hJUl9tdWx0aXBsZSA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX1JTSElSX211bHRpcGxlLCBSZXN1bHRzKVxuXG5BbGxvY2F0aW9uX1Jvc2VuYmVyZ2VyX211bHRpcGxlID1Sb3NlbmJlcmdlcl9tdWx0aXBsZShuLCBuMCwgVCwgUmVzdWx0cylcblRvdGFsU3VjY2Vzc2VzX1Jvc2VuYmVyZ2VyX211bHRpcGxlID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fUm9zZW5iZXJnZXJfbXVsdGlwbGUsIFJlc3VsdHMpXG5cbkFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX211bHRpcGxlID0gT3B0aW1hbEFkanVzdGVkX211bHRpcGxlKG4sIG4wLCBULCBSZXN1bHRzKVxuVG90YWxTdWNjZXNzZXNfT3B0aW1hbEFkanVzdGVkX211bHRpcGxlID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX211bHRpcGxlLCBSZXN1bHRzKVxuYGBgIn0= -->
+<pre class="r"><code># Play the winner
+Allocation_playTheWinner = playTheWinner(n, T, Results)
+TotalSuccesses_playTheWinner = successCount(Allocation_playTheWinner, Results)
+
+
+# Neyman Allocations
+Allocation_neyamn_known = neymanKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_neyamn_known = successCount(Allocation_neyamn_known, Results)
+
+Allocation_RSIHR_known = RSIHRKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_RSIHR_known = successCount(Allocation_RSIHR_known, Results)
+
+Allocation_Rosenberger_known = RosenbergerKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_Rosenberger_known = successCount(Allocation_Rosenberger_known, Results)
+
+Allocation_OptimalAdjusted_known = OptimalAdjustedKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_OptimalAdjusted_known = successCount(Allocation_OptimalAdjusted_known, Results)
+
+Allocation_neyamn_estimated = neymanEstimated_multiple(n, n0, T, Results)
+TotalSuccesses_neyamn_estimated = successCount(Allocation_neyamn_estimated, Results)
+
+Allocation_RSHIR_multiple = RSIHR_multiple(n, n0, T, Results)
+TotalSuccesses_RSHIR_multiple = successCount(Allocation_RSHIR_multiple, Results)
+
+Allocation_Rosenberger_multiple =Rosenberger_multiple(n, n0, T, Results)
+TotalSuccesses_Rosenberger_multiple = successCount(Allocation_Rosenberger_multiple, Results)
+
+Allocation_OptimalAdjusted_multiple = OptimalAdjusted_multiple(n, n0, T, Results)
+TotalSuccesses_OptimalAdjusted_multiple = successCount(Allocation_OptimalAdjusted_multiple, Results)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9yYW5kb20pXG5gYGAifQ== -->
+<pre class="r"><code>table(Allocation_random)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9yYW5kb21cbiAgMSAgIDIgICAzICAgNCAgIDUgXG4xOTUgMjA4IDE4MCAyMTQgMjAzIFxuIn0= -->
+<pre><code>Allocation_random
+  1   2   3   4   5 
+195 208 180 214 203 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9iaWFzZWRDb2luWywxXSlcbmBgYCJ9 -->
+<pre class="r"><code>table(Allocation_biasedCoin[,1])</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG4gIDEgICAyIFxuNTAxIDQ5OSBcbiJ9 -->
+<pre><code>
+  1   2 
+501 499 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9wbGF5VGhlV2lubmVyKVxuYGBgIn0= -->
+<pre class="r"><code>table(Allocation_playTheWinner)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9wbGF5VGhlV2lubmVyXG4gIDEgICAyICAgMyAgIDQgICA1IFxuIDk3IDE4OSA0NDAgMTY1IDEwOSBcbiJ9 -->
+<pre><code>Allocation_playTheWinner
+  1   2   3   4   5 
+ 97 189 440 165 109 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9uZXlhbW5fa25vd24pXG5gYGAifQ== -->
+<pre class="r"><code>table(Allocation_neyamn_known)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9uZXlhbW5fa25vd25cbiAgMSAgIDIgICAzICAgNCAgIDUgXG4xNTYgMjI5IDE5NyAyMzAgMTg4IFxuIn0= -->
+<pre><code>Allocation_neyamn_known
+  1   2   3   4   5 
+156 229 197 230 188 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9SU0lIUl9rbm93bilcbmBgYCJ9 -->
+<pre class="r"><code>table(Allocation_RSIHR_known)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9SU0lIUl9rbm93blxuICAxICAgMiAgIDMgICA0ICAgNSBcbjE1NCAyMzIgMjY3IDIwOCAxMzkgXG4ifQ== -->
+<pre><code>Allocation_RSIHR_known
+  1   2   3   4   5 
+154 232 267 208 139 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9rbm93bilcbmBgYCJ9 -->
+<pre class="r"><code>table(Allocation_Rosenberger_known)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9rbm93blxuICAxICAgMiAgIDMgICA0ICAgNSBcbiAzMSAyMTIgNTY4IDE1MiAgMzcgXG4ifQ== -->
+<pre><code>Allocation_Rosenberger_known
+  1   2   3   4   5 
+ 31 212 568 152  37 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9PcHRpbWFsQWRqdXN0ZWRfa25vd24pXG5gYGAifQ== -->
+<pre class="r"><code>table(Allocation_OptimalAdjusted_known)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9PcHRpbWFsQWRqdXN0ZWRfa25vd25cbiAgMSAgIDIgICAzICAgNCAgIDUgXG4yNTQgMTc4IDEyMCAyMTggMjMwIFxuIn0= -->
+<pre><code>Allocation_OptimalAdjusted_known
+  1   2   3   4   5 
+254 178 120 218 230 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9uZXlhbW5fZXN0aW1hdGVkKVxuYGBgIn0= -->
+<pre class="r"><code>table(Allocation_neyamn_estimated)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9uZXlhbW5fZXN0aW1hdGVkXG4gIDEgICAyICAgMyAgIDQgICA1IFxuMTY3IDIyNyAxNzkgMjM2IDE5MSBcbiJ9 -->
+<pre><code>Allocation_neyamn_estimated
+  1   2   3   4   5 
+167 227 179 236 191 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9SU0hJUl9tdWx0aXBsZSlcbmBgYCJ9 -->
+<pre class="r"><code>table(Allocation_RSHIR_multiple)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9SU0hJUl9tdWx0aXBsZVxuICAxICAgMiAgIDMgICA0ICAgNSBcbjEyOCAyMjMgMjczIDIxOSAxNTcgXG4ifQ== -->
+<pre><code>Allocation_RSHIR_multiple
+  1   2   3   4   5 
+128 223 273 219 157 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9tdWx0aXBsZSlcbmBgYCJ9 -->
+<pre class="r"><code>table(Allocation_Rosenberger_multiple)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9tdWx0aXBsZVxuICAxICAgMiAgIDMgICA0ICAgNSBcbiAyNiAyNTMgNTM0IDE0MCAgNDcgXG4ifQ== -->
+<pre><code>Allocation_Rosenberger_multiple
+  1   2   3   4   5 
+ 26 253 534 140  47 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFibGUoQWxsb2NhdGlvbl9PcHRpbWFsQWRqdXN0ZWRfbXVsdGlwbGUpXG5gYGAifQ== -->
+<pre class="r"><code>table(Allocation_OptimalAdjusted_multiple)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQWxsb2NhdGlvbl9PcHRpbWFsQWRqdXN0ZWRfbXVsdGlwbGVcbiAgMSAgIDIgICAzICAgNCAgIDUgXG4xNzYgMjIzIDEzNSAyMzEgMjM1IFxuIn0= -->
+<pre><code>Allocation_OptimalAdjusted_multiple
+  1   2   3   4   5 
+176 223 135 231 235 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfUmFuZG9tXG5gYGAifQ== -->
+<pre class="r"><code>TotalSuccesses_Random</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQzNVxuIn0= -->
+<pre><code>[1] 435</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfYmlhc2VkQ29pblxuYGBgIn0= -->
+<pre class="r"><code>TotalSuccesses_biasedCoin</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM5NlxuIn0= -->
+<pre><code>[1] 396</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfcGxheVRoZVdpbm5lclxuYGBgIn0= -->
+<pre class="r"><code>TotalSuccesses_playTheWinner</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDU4MFxuIn0= -->
+<pre><code>[1] 580</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfbmV5YW1uX2tub3duXG5gYGAifQ== -->
+<pre class="r"><code>TotalSuccesses_neyamn_known</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQ3MFxuIn0= -->
+<pre><code>[1] 470</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfUlNJSFJfa25vd25cbmBgYCJ9 -->
+<pre class="r"><code>TotalSuccesses_RSIHR_known</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDUxM1xuIn0= -->
+<pre><code>[1] 513</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfUm9zZW5iZXJnZXJfa25vd25cbmBgYCJ9 -->
+<pre class="r"><code>TotalSuccesses_Rosenberger_known</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDY3N1xuIn0= -->
+<pre><code>[1] 677</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfT3B0aW1hbEFkanVzdGVkX2tub3duXG5gYGAifQ== -->
+<pre class="r"><code>TotalSuccesses_OptimalAdjusted_known</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM4M1xuIn0= -->
+<pre><code>[1] 383</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfbmV5YW1uX2VzdGltYXRlZFxuYGBgIn0= -->
+<pre class="r"><code>TotalSuccesses_neyamn_estimated</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQ2N1xuIn0= -->
+<pre><code>[1] 467</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfUlNISVJfbXVsdGlwbGVcbmBgYCJ9 -->
+<pre class="r"><code>TotalSuccesses_RSHIR_multiple</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDUwOFxuIn0= -->
+<pre><code>[1] 508</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfUm9zZW5iZXJnZXJfbXVsdGlwbGVcbmBgYCJ9 -->
+<pre class="r"><code>TotalSuccesses_Rosenberger_multiple</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDY0OVxuIn0= -->
+<pre><code>[1] 649</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVG90YWxTdWNjZXNzZXNfT3B0aW1hbEFkanVzdGVkX211bHRpcGxlXG5gYGAifQ== -->
+<pre class="r"><code>TotalSuccesses_OptimalAdjusted_multiple</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQyM1xuIn0= -->
+<pre><code>[1] 423</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6DQogIHBkZl9kb2N1bWVudDogZGVmYXVsdA0KICBodG1sX25vdGVib29rOiBkZWZhdWx0DQotLS0NCg0KIyBBbGxvY2F0aW9uIG1ldGhvZHMNCkxldCB1cyBzdGFydCBieSBkZWZpbmluZyBmdW5jdGlvbnMgZm9yIGVhY2ggYWxsb2NhdGlvbiBtZXRob2QNCg0KIyMgQWxsb2NhdGlvbiBtZXRob2RzIHRoYXQgZG9uJ3QgdGFrZSBpbnRvIGFjY291bnQgY292YXJpYXRlcw0KDQojIyMgUmFuZG9tIGFuZCBSZXN0cmljdGVkIHJhbmRvbWlzYXRpb24NCg0KYGBge3J9DQoNCiMjIEFsbG9jYXRpb24gZnVuY3Rpb25zIHRoYXQgZG9uJ3QgdGFrZSBpbnRvIGFjY291bnQgY292YXJpYXRlcw0Kc291cmNlKCIuL01vZGVscy9TaW1wbGUvMV9SYW5kb21BbGxvY2F0aW9uLnIiKQ0Kc291cmNlKCIuL01vZGVscy9TaW1wbGUvMl9OZXltYW5Lbm93bi5yIikNCnNvdXJjZSgiLi9Nb2RlbHMvU2ltcGxlLzNfUlNJSFJLbm93bi5yIikNCnNvdXJjZSgiLi9Nb2RlbHMvU2ltcGxlLzRfUm9zZW5iZXJnZXJLbm93bi5yIikNCnNvdXJjZSgiLi9Nb2RlbHMvU2ltcGxlLzVfT3B0aW1hbEFkanVzdGVkS25vd24uciIpDQpzb3VyY2UoIi4vTW9kZWxzL1NpbXBsZS82X2JpYXNlZENvaW4uciIpDQpgYGANCg0KIyMgUmVzcG9uc2UgYWRhcHRpdmUgcmFuZG9taXNhdGlvbg0KDQojIyMgQ29pbiBiYXNlZCBkZXNpZ25zDQpgYGB7cn0NCnNvdXJjZSgiLi9Nb2RlbHMvUkEvN19Eb3VibHlCaWFzZWRDb2luLnIiKQ0KDQpgYGANCg0KDQojIyMgVHVybiBiYXNlZCBhbmQgR2l0dGlucyBpbmRleA0KYGBge3J9DQpzb3VyY2UoIi4vTW9kZWxzL1JBLzhfUGxheVRoZVdpbm5lci5SIikNCnNvdXJjZSgiLi9Nb2RlbHMvUkEvOV9QbGF5VGhlV2lubmVyUmFuZG9taXNlZF8yVC5SIikNCnNvdXJjZSgiLi9Nb2RlbHMvUkEvMTBfUGxheVRoZVdpbm5lclJhbmRvbWlzZWQuUiIpICMgTm90IHdvcmtpbmcgeWV0DQpzb3VyY2UoIi4vTW9kZWxzL1JBLzExX2dpdHRpbnNJbmRleC5SIikgIyBOb3Qgd29ya2luZyB5ZXQNCg0KDQpgYGANCg0KIyMjIFNlcXVlbnRpYWwgZXN0aW1hdGlvbiB0ZWNobmlxdWVzIFR3byBUcmVhdG1lbnRzDQpgYGB7cn0NCnNvdXJjZSgiLi9Nb2RlbHMvUkEvMTJfTmV5bWFuRXN0aW1hdGVkX2JpbmFyeS5SIikNCnNvdXJjZSgiLi9Nb2RlbHMvUkEvMTNfUlNJSFJfYmluYXJ5LlIiKQ0Kc291cmNlKCIuL01vZGVscy9SQS8xNF9Sb3NlbmJlcmdlcl9iaW5hcnkuUiIpDQpzb3VyY2UoIi4vTW9kZWxzL1JBLzE1X09wdGltYWxBZGp1c3RlZF9iaW5hcnkuUiIpDQpgYGANCg0KIyMjIFNlcXVlbnRpYWwgZXN0aW1hdGlvbiB0ZWNobmlxdWVzIE11bHRpcGxlIFRyZWF0bWVudHMgLSBzaW1wbGUgZXh0ZW5zaW9ucw0KYGBge3J9DQpzb3VyY2UoIi4vTW9kZWxzL1JBLzE2X05leW1hbkVzdGltYXRlZF9NdWx0aXBsZS5SIikNCnNvdXJjZSgiLi9Nb2RlbHMvUkEvMTdfUlNJSFJFc3RpbWF0ZWRfbXVsdGlwbGUuUiIpDQpzb3VyY2UoIi4vTW9kZWxzL1JBLzE4X1Jvc2VuYmVyZ2VyX211bHRpcGxlLlIiKQ0Kc291cmNlKCIuL01vZGVscy9SQS8xOV9PcHRpbWFsQWRqdXN0ZWRfbXVsdGlwbGUuUiIpDQoNCmBgYA0KDQoNCiMjIEFsbG9jYXRpb24gc3RyYXRlZ2llcyB0aGF0IHRha2UgaW50byBhY2NvdW50IGNvdmFyaWF0ZXMNCg0KIyMjIFNlcXVlbnRpYWwgZXN0aW1hdGlvbg0KYGBge3J9DQoNCiMjIEFsbG9jYXRpb24gZnVuY3Rpb25zIHRoYXQgdGFrZSBpbnRvIGFjY291bnQgY292YXJpYXRlcw0KQ0FSQTEgPC0gZnVuY3Rpb24obiwgbjAsIFQsIFosIFJlc3VsdHMpew0KICANCn0NCg0KQ0FSQTIgPC0gZnVuY3Rpb24obiwgbjAsIFQsIFosIFJlc3VsdHMpew0KICANCn0NCg0KQ0FSQTMgPC0gZnVuY3Rpb24obiwgbjAsIFQsIFosIFJlc3VsdHMpew0KICANCn0NCg0KYGBgDQoNCg0KDQoNCiMgU2ltdWxhdGlvbg0Kc2V0dGluZyB1cCB0aGUgcHJvYmxlbQ0KDQpgYGB7cn0NCm4gPSAxMDAwICMgTnVtYmVyIG9mIHN1YmplY3RzDQpuMCA9IDUNCg0KWiA9IHJiaW5vbShuLDEsMC41KSAjIFNpbXVsYXRlIHNpbmdsZSBiaW5hcnkgY292YXJpYXRlDQoNClN1Y2Nlc3NQcm9icyA9IGMoMC4yLCAwLjYpDQoNClN1Y2Nlc3NQcm9ic19aID0gbWF0cml4KGRhdGEgPSBjKDAuMSwgMC4zLCAwLjcsIDAuMSksIG5yb3cgPSAyLCBuY29sID0gMikNCmBgYA0KDQpOb3cgd2UgY2FuIG1vZGVsIGRpZmZlcmVudCB0cmVhdG1lbnQgYWxsb2NhdGlvbiBzdHJhdGVnaWVzDQoNCmBgYHtyfQ0KIyBSZXN1bHRzDQpUID0gbGVuZ3RoKFN1Y2Nlc3NQcm9icykNClJlc3VsdHMgPSBtYXRyaXgoMCwgbnJvdyA9IG4sIG5jb2wgPSBUKQ0KDQpmb3IgKGkgaW4gMTpUKSB7DQogIFJlc3VsdHNbICwgaV0gPSByYmlub20obiwgMSwgU3VjY2Vzc1Byb2JzW2ldKSANCn0NCg0KIyBSZXN1bHRzIG1lYXN1cmVzDQpzb3VyY2UoIi4vUmVzdWx0TWVhc3VyZXMvc3VjY2Vzc0NvdW50LlIiKQ0KDQpsaWJyYXJ5KHB3cikNCg0KDQojIFB1cmUgcmFuZG9tDQpBbGxvY2F0aW9uX3JhbmRvbSA9IHJhbmRvbUFsbG9jYXRpb24obiwgVCkNClRvdGFsU3VjY2Vzc2VzX1JhbmRvbSA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX3JhbmRvbSwgUmVzdWx0cykNCg0KaCA9IFN1Y2Nlc3NQcm9ic1syXSAtIFN1Y2Nlc3NQcm9ic1sxXQ0KbjEgPSBzdW0oQWxsb2NhdGlvbl9yYW5kb20gPT0gMSkNCm4yID0gbiAtIG4xDQpwb3dlciA9IHB3ci4ycDJuLnRlc3QoaCA9IGgsIG4xID0gIG4xLCBuMiA9IG4yLCBzaWcubGV2ZWw9MC4wNSwgYWx0ZXJuYXRpdmUgPSAidHdvLnNpZGVkIikNCg0KICANCiMgQmlhc2VkIENvaW4NCkFsbG9jYXRpb25fYmlhc2VkQ29pbiA9IGJpYXNlZENvaW5BbGxvY2F0aW9uKG4sIDEvMykNClRvdGFsU3VjY2Vzc2VzX2JpYXNlZENvaW4gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9iaWFzZWRDb2luWywxXSwgUmVzdWx0cykNCg0KYGBgDQoNCmBgYHtyfQ0KIyBQbGF5IHRoZSB3aW5uZXINCkFsbG9jYXRpb25fcGxheVRoZVdpbm5lciA9IHBsYXlUaGVXaW5uZXIobiwgVCwgUmVzdWx0cykNClRvdGFsU3VjY2Vzc2VzX3BsYXlUaGVXaW5uZXIgPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9wbGF5VGhlV2lubmVyLCBSZXN1bHRzKQ0KDQpBbGxvY2F0aW9uX3BsYXlUaGVXaW5uZXJfUmFuZG9taXNlZCA9IHBsYXlUaGVXaW5uZXJSYW5kb21pc2VkXzJUKG4sIFJlc3VsdHMsIDEsIDEpDQpUb3RhbFN1Y2Nlc3Nlc19wbGF5VGhlV2lubmVyX1JhbmRvbWlzZWQgPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9wbGF5VGhlV2lubmVyX1JhbmRvbWlzZWRbLDFdLCBSZXN1bHRzKQ0KDQojIE5leW1hbiBBbGxvY2F0aW9ucw0KQWxsb2NhdGlvbl9uZXlhbW5fa25vd24gPSBuZXltYW5Lbm93bihuLCBULCBSZXN1bHRzLCBTdWNjZXNzUHJvYnMpDQpUb3RhbFN1Y2Nlc3Nlc19uZXlhbW5fa25vd24gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9uZXlhbW5fa25vd24sIFJlc3VsdHMpDQoNCkFsbG9jYXRpb25fbmV5YW1uX2VzdGltYXRlZCA9IG5leW1hbkVzdGltYXRlZF9iaW5hcnkobiwgbjAsIFJlc3VsdHMpDQpUb3RhbFN1Y2Nlc3Nlc19uZXlhbW5fZXN0aW1hdGVkID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fbmV5YW1uX2VzdGltYXRlZCwgUmVzdWx0cykNCg0KQWxsb2NhdGlvbl9SU0hJUl9iaW5hcnkgPSBSU0lIUl9iaW5hcnkobiwgbjAsIFJlc3VsdHMpDQpUb3RhbFN1Y2Nlc3Nlc19SU0hJUl9iaW5hcnkgPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9SU0hJUl9iaW5hcnksIFJlc3VsdHMpDQoNCkFsbG9jYXRpb25fUm9zZW5iZXJnZXJfYmluYXJ5ID1Sb3NlbmJlcmdlcl9iaW5hcnkobiwgbjAsIFJlc3VsdHMpDQpUb3RhbFN1Y2Nlc3Nlc19Sb3NlbmJlcmdlcl9iaW5hcnkgPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9iaW5hcnksIFJlc3VsdHMpDQoNCkFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX2JpbmFyeSA9IE9wdGltYWxBZGp1c3RlZF9iaW5hcnkobiwgbjAsIFJlc3VsdHMpDQpUb3RhbFN1Y2Nlc3Nlc19PcHRpbWFsQWRqdXN0ZWRfYmluYXJ5ID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX2JpbmFyeSwgUmVzdWx0cykNCmBgYA0KDQpgYGB7cn0NCnRhYmxlKEFsbG9jYXRpb25fcmFuZG9tKQ0KdGFibGUoQWxsb2NhdGlvbl9iaWFzZWRDb2luWywxXSkNCnRhYmxlKEFsbG9jYXRpb25fcGxheVRoZVdpbm5lcikNCnRhYmxlKEFsbG9jYXRpb25fbmV5YW1uX2tub3duKQ0KdGFibGUoQWxsb2NhdGlvbl9uZXlhbW5fZXN0aW1hdGVkKQ0KdGFibGUoQWxsb2NhdGlvbl9SU0hJUl9iaW5hcnkpDQp0YWJsZShBbGxvY2F0aW9uX1Jvc2VuYmVyZ2VyX2JpbmFyeSkNCnRhYmxlKEFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX2JpbmFyeSkNCg0KVG90YWxTdWNjZXNzZXNfUmFuZG9tDQpUb3RhbFN1Y2Nlc3Nlc19iaWFzZWRDb2luDQpUb3RhbFN1Y2Nlc3Nlc19wbGF5VGhlV2lubmVyDQpUb3RhbFN1Y2Nlc3Nlc19wbGF5VGhlV2lubmVyX1JhbmRvbWlzZWQNClRvdGFsU3VjY2Vzc2VzX25leWFtbl9rbm93bg0KVG90YWxTdWNjZXNzZXNfbmV5YW1uX2VzdGltYXRlZA0KVG90YWxTdWNjZXNzZXNfUlNISVJfYmluYXJ5DQpUb3RhbFN1Y2Nlc3Nlc19Sb3NlbmJlcmdlcl9iaW5hcnkNClRvdGFsU3VjY2Vzc2VzX09wdGltYWxBZGp1c3RlZF9iaW5hcnkNCg0KYGBgDQoNCg0KDQpzZXR0aW5nIHVwIG11bHRpLXRyZWF0bWVudCB0aGUgcHJvYmxlbQ0KDQpgYGB7cn0NCm4gPSAxMDAwICMgTnVtYmVyIG9mIHN1YmplY3RzDQpuMCA9IDUNCg0KWiA9IHJiaW5vbShuLDEsMC41KSAjIFNpbXVsYXRlIHNpbmdsZSBiaW5hcnkgY292YXJpYXRlDQoNClN1Y2Nlc3NQcm9icyA9IGMoMC4yLCAwLjYsIDAuOCwgMC41LCAwLjIpDQoNClN1Y2Nlc3NQcm9ic19aID0gbWF0cml4KGRhdGEgPSBjKDAuMSwgMC4zLCAwLjcsIDAuMSwgMC44LCAwLjgsIDAuMiwgMC44LCAwLjE1LCAwLjI1KSwgbnJvdyA9IDUsIG5jb2wgPSAyKQ0KDQpUID0gNQ0KYGBgDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6DQogIHBkZl9kb2N1bWVudDogZGVmYXVsdA0KICBodG1sX25vdGVib29rOiBkZWZhdWx0DQotLS0NCg0KYGBge3J9DQpzb3VyY2UoIi4vSGVscGVycy9Jbml0aWFsaXNlLlIiKQ0Kc291cmNlKCIuL0hlbHBlcnMvSW5pdGlhbGlzZVdDb3ZhcmlhdGVzLlIiKQ0KYGBgDQoNCg0KIyBBbGxvY2F0aW9uIG1ldGhvZHMNCkxldCB1cyBzdGFydCBieSBkZWZpbmluZyBmdW5jdGlvbnMgZm9yIGVhY2ggYWxsb2NhdGlvbiBtZXRob2QNCg0KIyMgQWxsb2NhdGlvbiBtZXRob2RzIHRoYXQgZG9uJ3QgdGFrZSBpbnRvIGFjY291bnQgY292YXJpYXRlcw0KDQojIyMgUmFuZG9tIGFuZCBSZXN0cmljdGVkIHJhbmRvbWlzYXRpb24NCg0KYGBge3J9DQoNCiMjIEFsbG9jYXRpb24gZnVuY3Rpb25zIHRoYXQgZG9uJ3QgdGFrZSBpbnRvIGFjY291bnQgY292YXJpYXRlcw0Kc291cmNlKCIuL01vZGVscy9TaW1wbGUvMV9SYW5kb21BbGxvY2F0aW9uLnIiKQ0Kc291cmNlKCIuL01vZGVscy9TaW1wbGUvMl9OZXltYW5Lbm93bi5yIikNCnNvdXJjZSgiLi9Nb2RlbHMvU2ltcGxlLzNfUlNJSFJLbm93bi5yIikNCnNvdXJjZSgiLi9Nb2RlbHMvU2ltcGxlLzRfUm9zZW5iZXJnZXJLbm93bi5yIikNCnNvdXJjZSgiLi9Nb2RlbHMvU2ltcGxlLzVfT3B0aW1hbEFkanVzdGVkS25vd24uciIpDQpzb3VyY2UoIi4vTW9kZWxzL1NpbXBsZS82X2JpYXNlZENvaW4uciIpDQpgYGANCg0KIyMgUmVzcG9uc2UgYWRhcHRpdmUgcmFuZG9taXNhdGlvbg0KDQojIyMgQ29pbiBiYXNlZCBkZXNpZ25zDQpgYGB7cn0NCnNvdXJjZSgiLi9Nb2RlbHMvUkEvN19Eb3VibHlCaWFzZWRDb2luLnIiKQ0KDQpgYGANCg0KDQojIyMgVHVybiBiYXNlZCBhbmQgR2l0dGlucyBpbmRleA0KYGBge3J9DQpzb3VyY2UoIi4vTW9kZWxzL1JBLzhfUGxheVRoZVdpbm5lci5SIikNCnNvdXJjZSgiLi9Nb2RlbHMvUkEvOV9QbGF5VGhlV2lubmVyUmFuZG9taXNlZF8yVC5SIikNCnNvdXJjZSgiLi9Nb2RlbHMvUkEvMTBfUGxheVRoZVdpbm5lclJhbmRvbWlzZWQuUiIpICMgTm90IHdvcmtpbmcgeWV0DQpzb3VyY2UoIi4vTW9kZWxzL1JBLzExX2dpdHRpbnNJbmRleC5SIikgIyBOb3Qgd29ya2luZyB5ZXQNCg0KDQpgYGANCg0KIyMjIFNlcXVlbnRpYWwgZXN0aW1hdGlvbiB0ZWNobmlxdWVzIFR3byBUcmVhdG1lbnRzDQpgYGB7cn0NCnNvdXJjZSgiLi9Nb2RlbHMvUkEvMTJfTmV5bWFuRXN0aW1hdGVkX2JpbmFyeS5SIikNCnNvdXJjZSgiLi9Nb2RlbHMvUkEvMTNfUlNJSFJfYmluYXJ5LlIiKQ0Kc291cmNlKCIuL01vZGVscy9SQS8xNF9Sb3NlbmJlcmdlcl9iaW5hcnkuUiIpDQpzb3VyY2UoIi4vTW9kZWxzL1JBLzE1X09wdGltYWxBZGp1c3RlZF9iaW5hcnkuUiIpDQpgYGANCg0KIyMjIFNlcXVlbnRpYWwgZXN0aW1hdGlvbiB0ZWNobmlxdWVzIE11bHRpcGxlIFRyZWF0bWVudHMgLSBzaW1wbGUgZXh0ZW5zaW9ucw0KYGBge3J9DQpzb3VyY2UoIi4vTW9kZWxzL1JBLzE2X05leW1hbkVzdGltYXRlZF9NdWx0aXBsZS5SIikNCnNvdXJjZSgiLi9Nb2RlbHMvUkEvMTdfUlNJSFJFc3RpbWF0ZWRfbXVsdGlwbGUuUiIpDQpzb3VyY2UoIi4vTW9kZWxzL1JBLzE4X1Jvc2VuYmVyZ2VyX211bHRpcGxlLlIiKQ0Kc291cmNlKCIuL01vZGVscy9SQS8xOV9PcHRpbWFsQWRqdXN0ZWRfbXVsdGlwbGUuUiIpDQoNCmBgYA0KDQoNCiMjIEFsbG9jYXRpb24gc3RyYXRlZ2llcyB0aGF0IHRha2UgaW50byBhY2NvdW50IGNvdmFyaWF0ZXMNCg0KIyMjIFNlcXVlbnRpYWwgZXN0aW1hdGlvbg0KYGBge3J9DQoNCiMjIEFsbG9jYXRpb24gZnVuY3Rpb25zIHRoYXQgdGFrZSBpbnRvIGFjY291bnQgY292YXJpYXRlcw0KQ0FSQTEgPC0gZnVuY3Rpb24obiwgbjAsIFQsIFosIFJlc3VsdHMpew0KICANCn0NCg0KQ0FSQTIgPC0gZnVuY3Rpb24obiwgbjAsIFQsIFosIFJlc3VsdHMpew0KICANCn0NCg0KQ0FSQTMgPC0gZnVuY3Rpb24obiwgbjAsIFQsIFosIFJlc3VsdHMpew0KICANCn0NCg0KYGBgDQoNCg0KDQoNCiMgU2ltdWxhdGlvbg0Kc2V0dGluZyB1cCB0aGUgcHJvYmxlbQ0KDQpgYGB7cn0NCm4gPSAxMDAwICMgTnVtYmVyIG9mIHN1YmplY3RzDQpuMCA9IDUNCg0KWiA9IHJiaW5vbShuLDEsMC41KSAjIFNpbXVsYXRlIHNpbmdsZSBiaW5hcnkgY292YXJpYXRlDQoNClN1Y2Nlc3NQcm9icyA9IGMoMC4yLCAwLjYpDQoNClN1Y2Nlc3NQcm9ic19aID0gbWF0cml4KGRhdGEgPSBjKDAuMSwgMC4zLCAwLjcsIDAuMSksIG5yb3cgPSAyLCBuY29sID0gMikNCmBgYA0KDQpOb3cgd2UgY2FuIG1vZGVsIGRpZmZlcmVudCB0cmVhdG1lbnQgYWxsb2NhdGlvbiBzdHJhdGVnaWVzDQoNCmBgYHtyfQ0KIyBSZXN1bHRzDQpUID0gbGVuZ3RoKFN1Y2Nlc3NQcm9icykNClJlc3VsdHMgPSBtYXRyaXgoMCwgbnJvdyA9IG4sIG5jb2wgPSBUKQ0KDQpmb3IgKGkgaW4gMTpUKSB7DQogIFJlc3VsdHNbICwgaV0gPSByYmlub20obiwgMSwgU3VjY2Vzc1Byb2JzW2ldKSANCn0NCg0KIyBSZXN1bHRzIG1lYXN1cmVzDQpzb3VyY2UoIi4vUmVzdWx0TWVhc3VyZXMvc3VjY2Vzc0NvdW50LlIiKQ0KDQpsaWJyYXJ5KHB3cikNCg0KDQojIFB1cmUgcmFuZG9tDQpBbGxvY2F0aW9uX3JhbmRvbSA9IHJhbmRvbUFsbG9jYXRpb24obiwgVCkNClRvdGFsU3VjY2Vzc2VzX1JhbmRvbSA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX3JhbmRvbSwgUmVzdWx0cykNCg0KaCA9IFN1Y2Nlc3NQcm9ic1syXSAtIFN1Y2Nlc3NQcm9ic1sxXQ0KbjEgPSBzdW0oQWxsb2NhdGlvbl9yYW5kb20gPT0gMSkNCm4yID0gbiAtIG4xDQpwb3dlciA9IHB3ci4ycDJuLnRlc3QoaCA9IGgsIG4xID0gIG4xLCBuMiA9IG4yLCBzaWcubGV2ZWw9MC4wNSwgYWx0ZXJuYXRpdmUgPSAidHdvLnNpZGVkIikNCg0KICANCiMgQmlhc2VkIENvaW4NCkFsbG9jYXRpb25fYmlhc2VkQ29pbiA9IGJpYXNlZENvaW4obiwgMS8zKQ0KVG90YWxTdWNjZXNzZXNfYmlhc2VkQ29pbiA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX2JpYXNlZENvaW5bLDFdLCBSZXN1bHRzKQ0KDQpgYGANCg0KYGBge3J9DQojIFBsYXkgdGhlIHdpbm5lcg0KQWxsb2NhdGlvbl9wbGF5VGhlV2lubmVyID0gcGxheVRoZVdpbm5lcihuLCBULCBSZXN1bHRzKQ0KVG90YWxTdWNjZXNzZXNfcGxheVRoZVdpbm5lciA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX3BsYXlUaGVXaW5uZXIsIFJlc3VsdHMpDQoNCkFsbG9jYXRpb25fcGxheVRoZVdpbm5lcl9SYW5kb21pc2VkID0gcGxheVRoZVdpbm5lclJhbmRvbWlzZWRfMlQobiwgUmVzdWx0cywgMSwgMSkNClRvdGFsU3VjY2Vzc2VzX3BsYXlUaGVXaW5uZXJfUmFuZG9taXNlZCA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX3BsYXlUaGVXaW5uZXJfUmFuZG9taXNlZFssMV0sIFJlc3VsdHMpDQoNCiMgTmV5bWFuIEFsbG9jYXRpb25zDQpBbGxvY2F0aW9uX25leWFtbl9rbm93biA9IG5leW1hbktub3duKG4sIFQsIFJlc3VsdHMsIFN1Y2Nlc3NQcm9icykNClRvdGFsU3VjY2Vzc2VzX25leWFtbl9rbm93biA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX25leWFtbl9rbm93biwgUmVzdWx0cykNCg0KQWxsb2NhdGlvbl9SU0lIUl9rbm93biA9IFJTSUhSS25vd24obiwgVCwgUmVzdWx0cywgU3VjY2Vzc1Byb2JzKQ0KVG90YWxTdWNjZXNzZXNfUlNJSFJfa25vd24gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9SU0lIUl9rbm93biwgUmVzdWx0cykNCg0KQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9rbm93biA9IFJvc2VuYmVyZ2VyS25vd24obiwgVCwgUmVzdWx0cywgU3VjY2Vzc1Byb2JzKQ0KVG90YWxTdWNjZXNzZXNfUm9zZW5iZXJnZXJfa25vd24gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9rbm93biwgUmVzdWx0cykNCg0KQWxsb2NhdGlvbl9PcHRpbWFsQWRqdXN0ZWRfa25vd24gPSBPcHRpbWFsQWRqdXN0ZWRLbm93bihuLCBULCBSZXN1bHRzLCBTdWNjZXNzUHJvYnMpDQpUb3RhbFN1Y2Nlc3Nlc19PcHRpbWFsQWRqdXN0ZWRfa25vd24gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9PcHRpbWFsQWRqdXN0ZWRfa25vd24sIFJlc3VsdHMpDQoNCg0KIyBFc3RpbWF0ZWQgYWxsb2NhdGlvbnMNCkFsbG9jYXRpb25fbmV5YW1uX2VzdGltYXRlZCA9IG5leW1hbkVzdGltYXRlZF9iaW5hcnkobiwgbjAsIFJlc3VsdHMpDQpUb3RhbFN1Y2Nlc3Nlc19uZXlhbW5fZXN0aW1hdGVkID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fbmV5YW1uX2VzdGltYXRlZCwgUmVzdWx0cykNCg0KQWxsb2NhdGlvbl9SU0hJUl9iaW5hcnkgPSBSU0lIUl9iaW5hcnkobiwgbjAsIFJlc3VsdHMpDQpUb3RhbFN1Y2Nlc3Nlc19SU0hJUl9iaW5hcnkgPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9SU0hJUl9iaW5hcnksIFJlc3VsdHMpDQoNCkFsbG9jYXRpb25fUm9zZW5iZXJnZXJfYmluYXJ5ID1Sb3NlbmJlcmdlcl9iaW5hcnkobiwgbjAsIFJlc3VsdHMpDQpUb3RhbFN1Y2Nlc3Nlc19Sb3NlbmJlcmdlcl9iaW5hcnkgPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9iaW5hcnksIFJlc3VsdHMpDQoNCkFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX2JpbmFyeSA9IE9wdGltYWxBZGp1c3RlZF9iaW5hcnkobiwgbjAsIFJlc3VsdHMpDQpUb3RhbFN1Y2Nlc3Nlc19PcHRpbWFsQWRqdXN0ZWRfYmluYXJ5ID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX2JpbmFyeSwgUmVzdWx0cykNCmBgYA0KDQpgYGB7cn0NCnRhYmxlKEFsbG9jYXRpb25fcmFuZG9tKQ0KdGFibGUoQWxsb2NhdGlvbl9iaWFzZWRDb2luWywxXSkNCnRhYmxlKEFsbG9jYXRpb25fcGxheVRoZVdpbm5lcikNCnRhYmxlKEFsbG9jYXRpb25fbmV5YW1uX2tub3duKQ0KdGFibGUoQWxsb2NhdGlvbl9uZXlhbW5fZXN0aW1hdGVkKQ0KdGFibGUoQWxsb2NhdGlvbl9SU0hJUl9iaW5hcnkpDQp0YWJsZShBbGxvY2F0aW9uX1Jvc2VuYmVyZ2VyX2JpbmFyeSkNCnRhYmxlKEFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX2JpbmFyeSkNCg0KVG90YWxTdWNjZXNzZXNfUmFuZG9tDQpUb3RhbFN1Y2Nlc3Nlc19iaWFzZWRDb2luDQpUb3RhbFN1Y2Nlc3Nlc19wbGF5VGhlV2lubmVyDQpUb3RhbFN1Y2Nlc3Nlc19wbGF5VGhlV2lubmVyX1JhbmRvbWlzZWQNClRvdGFsU3VjY2Vzc2VzX25leWFtbl9rbm93bg0KVG90YWxTdWNjZXNzZXNfbmV5YW1uX2VzdGltYXRlZA0KVG90YWxTdWNjZXNzZXNfUlNISVJfYmluYXJ5DQpUb3RhbFN1Y2Nlc3Nlc19Sb3NlbmJlcmdlcl9iaW5hcnkNClRvdGFsU3VjY2Vzc2VzX09wdGltYWxBZGp1c3RlZF9iaW5hcnkNCg0KYGBgDQoNCg0KDQpzZXR0aW5nIHVwIG11bHRpLXRyZWF0bWVudCB0aGUgcHJvYmxlbQ0KDQpgYGB7cn0NCm4gPSAxMDAwICMgTnVtYmVyIG9mIHN1YmplY3RzDQpuMCA9IDIwDQoNClogPSByYmlub20obiwxLDAuNSkgIyBTaW11bGF0ZSBzaW5nbGUgYmluYXJ5IGNvdmFyaWF0ZQ0KDQpTdWNjZXNzUHJvYnMgPSBjKDAuMiwgMC42LCAwLjgsIDAuNSwgMC4yKQ0KDQpTdWNjZXNzUHJvYnNfWiA9IG1hdHJpeChkYXRhID0gYygwLjEsIDAuMywgMC43LCAwLjEsIDAuOCwgMC44LCAwLjIsIDAuOCwgMC4xNSwgMC4yNSksIG5yb3cgPSA1LCBuY29sID0gMikNCg0KIyBSZXN1bHRzDQpUID0gbGVuZ3RoKFN1Y2Nlc3NQcm9icykNClJlc3VsdHMgPSBtYXRyaXgoMCwgbnJvdyA9IG4sIG5jb2wgPSBUKQ0KDQpmb3IgKGkgaW4gMTpUKSB7DQogIFJlc3VsdHNbICwgaV0gPSByYmlub20obiwgMSwgU3VjY2Vzc1Byb2JzW2ldKSANCn0NCmBgYA0KDQoNCmBgYHtyfQ0KIyBQdXJlIHJhbmRvbQ0KQWxsb2NhdGlvbl9yYW5kb20gPSByYW5kb21BbGxvY2F0aW9uKG4sIFQpDQpUb3RhbFN1Y2Nlc3Nlc19SYW5kb20gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9yYW5kb20sIFJlc3VsdHMpDQoNCmBgYA0KDQpgYGB7cn0NCiMgUGxheSB0aGUgd2lubmVyDQpBbGxvY2F0aW9uX3BsYXlUaGVXaW5uZXIgPSBwbGF5VGhlV2lubmVyKG4sIFQsIFJlc3VsdHMpDQpUb3RhbFN1Y2Nlc3Nlc19wbGF5VGhlV2lubmVyID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fcGxheVRoZVdpbm5lciwgUmVzdWx0cykNCg0KDQojIE5leW1hbiBBbGxvY2F0aW9ucw0KQWxsb2NhdGlvbl9uZXlhbW5fa25vd24gPSBuZXltYW5Lbm93bihuLCBULCBSZXN1bHRzLCBTdWNjZXNzUHJvYnMpDQpUb3RhbFN1Y2Nlc3Nlc19uZXlhbW5fa25vd24gPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9uZXlhbW5fa25vd24sIFJlc3VsdHMpDQoNCkFsbG9jYXRpb25fUlNJSFJfa25vd24gPSBSU0lIUktub3duKG4sIFQsIFJlc3VsdHMsIFN1Y2Nlc3NQcm9icykNClRvdGFsU3VjY2Vzc2VzX1JTSUhSX2tub3duID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fUlNJSFJfa25vd24sIFJlc3VsdHMpDQoNCkFsbG9jYXRpb25fUm9zZW5iZXJnZXJfa25vd24gPSBSb3NlbmJlcmdlcktub3duKG4sIFQsIFJlc3VsdHMsIFN1Y2Nlc3NQcm9icykNClRvdGFsU3VjY2Vzc2VzX1Jvc2VuYmVyZ2VyX2tub3duID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fUm9zZW5iZXJnZXJfa25vd24sIFJlc3VsdHMpDQoNCkFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX2tub3duID0gT3B0aW1hbEFkanVzdGVkS25vd24obiwgVCwgUmVzdWx0cywgU3VjY2Vzc1Byb2JzKQ0KVG90YWxTdWNjZXNzZXNfT3B0aW1hbEFkanVzdGVkX2tub3duID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX2tub3duLCBSZXN1bHRzKQ0KDQpBbGxvY2F0aW9uX25leWFtbl9lc3RpbWF0ZWQgPSBuZXltYW5Fc3RpbWF0ZWRfbXVsdGlwbGUobiwgbjAsIFQsIFJlc3VsdHMpDQpUb3RhbFN1Y2Nlc3Nlc19uZXlhbW5fZXN0aW1hdGVkID0gc3VjY2Vzc0NvdW50KEFsbG9jYXRpb25fbmV5YW1uX2VzdGltYXRlZCwgUmVzdWx0cykNCg0KQWxsb2NhdGlvbl9SU0hJUl9tdWx0aXBsZSA9IFJTSUhSX211bHRpcGxlKG4sIG4wLCBULCBSZXN1bHRzKQ0KVG90YWxTdWNjZXNzZXNfUlNISVJfbXVsdGlwbGUgPSBzdWNjZXNzQ291bnQoQWxsb2NhdGlvbl9SU0hJUl9tdWx0aXBsZSwgUmVzdWx0cykNCg0KQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9tdWx0aXBsZSA9Um9zZW5iZXJnZXJfbXVsdGlwbGUobiwgbjAsIFQsIFJlc3VsdHMpDQpUb3RhbFN1Y2Nlc3Nlc19Sb3NlbmJlcmdlcl9tdWx0aXBsZSA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX1Jvc2VuYmVyZ2VyX211bHRpcGxlLCBSZXN1bHRzKQ0KDQpBbGxvY2F0aW9uX09wdGltYWxBZGp1c3RlZF9tdWx0aXBsZSA9IE9wdGltYWxBZGp1c3RlZF9tdWx0aXBsZShuLCBuMCwgVCwgUmVzdWx0cykNClRvdGFsU3VjY2Vzc2VzX09wdGltYWxBZGp1c3RlZF9tdWx0aXBsZSA9IHN1Y2Nlc3NDb3VudChBbGxvY2F0aW9uX09wdGltYWxBZGp1c3RlZF9tdWx0aXBsZSwgUmVzdWx0cykNCmBgYA0KDQoNCmBgYHtyfQ0KdGFibGUoQWxsb2NhdGlvbl9yYW5kb20pDQp0YWJsZShBbGxvY2F0aW9uX2JpYXNlZENvaW5bLDFdKQ0KdGFibGUoQWxsb2NhdGlvbl9wbGF5VGhlV2lubmVyKQ0KdGFibGUoQWxsb2NhdGlvbl9uZXlhbW5fa25vd24pDQp0YWJsZShBbGxvY2F0aW9uX1JTSUhSX2tub3duKQ0KdGFibGUoQWxsb2NhdGlvbl9Sb3NlbmJlcmdlcl9rbm93bikNCnRhYmxlKEFsbG9jYXRpb25fT3B0aW1hbEFkanVzdGVkX2tub3duKQ0KdGFibGUoQWxsb2NhdGlvbl9uZXlhbW5fZXN0aW1hdGVkKQ0KdGFibGUoQWxsb2NhdGlvbl9SU0hJUl9tdWx0aXBsZSkNCnRhYmxlKEFsbG9jYXRpb25fUm9zZW5iZXJnZXJfbXVsdGlwbGUpDQp0YWJsZShBbGxvY2F0aW9uX09wdGltYWxBZGp1c3RlZF9tdWx0aXBsZSkNCg0KVG90YWxTdWNjZXNzZXNfUmFuZG9tDQpUb3RhbFN1Y2Nlc3Nlc19iaWFzZWRDb2luDQpUb3RhbFN1Y2Nlc3Nlc19wbGF5VGhlV2lubmVyDQpUb3RhbFN1Y2Nlc3Nlc19uZXlhbW5fa25vd24NClRvdGFsU3VjY2Vzc2VzX1JTSUhSX2tub3duDQpUb3RhbFN1Y2Nlc3Nlc19Sb3NlbmJlcmdlcl9rbm93bg0KVG90YWxTdWNjZXNzZXNfT3B0aW1hbEFkanVzdGVkX2tub3duDQoNClRvdGFsU3VjY2Vzc2VzX25leWFtbl9lc3RpbWF0ZWQNClRvdGFsU3VjY2Vzc2VzX1JTSElSX211bHRpcGxlDQpUb3RhbFN1Y2Nlc3Nlc19Sb3NlbmJlcmdlcl9tdWx0aXBsZQ0KVG90YWxTdWNjZXNzZXNfT3B0aW1hbEFkanVzdGVkX211bHRpcGxlDQpgYGANCg0K</div>
 
 
 

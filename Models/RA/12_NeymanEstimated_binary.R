@@ -1,17 +1,19 @@
 neymanEstimated_binary <- function(n, n0, Results){
-  Allocation = rep(0,n)
   T = 2
-  #First initialise by assigning no to each treatment
   
-  for (t in 1:T) {
-    Allocation[(n0*(t-1)+1):(t*n0)] = t
-  }
-  
-  for (i in (T*n0+1):n) {
-    i
-    pA = mean(Results[Allocation[1:(i-1)] == 1 ,1])
+  # First initialise by assigning no to each treatment
+  # We keep on going though until we see at least one success and one failure for
+  # each treatment
+
+  Allocation = Initialise(n, n0, T, Results)
+  counter = sum(Allocation != 0)  
+    
+  for (i in (counter+1):n) {
+    Res = Results[1:(i-1), ]
+    All = Allocation[1:(i-1)]
+    pA = mean(Res[All == 1 ,1])
     qA = 1 - pA
-    pB = mean(Results[Allocation[1:(i-1)] == 2 ,2])
+    pB = mean(Res[All == 2 ,2])
     qB = 1 - pB
     R = sqrt((pA*qA)/(pB*qB))
     prob = R/(1+R)

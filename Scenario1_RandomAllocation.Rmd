@@ -1,0 +1,158 @@
+---
+title: "Scenario1_RandomAllocation"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r}
+# Results measures
+source("./ResultMeasures/successCount.R")
+source("./ResultMeasures/successTreatmentCount.R")
+
+# Helper files
+source("./Helpers/Initialise.R")
+source("./Helpers/InitialiseWCovariates.R")
+```
+
+# Allocation methods we will use
+```{r}
+source("./Models/Simple/1_RandomAllocation.r")
+source("./Models/Simple/2_NeymanKnown.r")
+source("./Models/Simple/3_RSIHRKnown.r")
+source("./Models/Simple/4_RosenbergerKnown.r")
+source("./Models/Simple/5_OptimalAdjustedKnown.r")
+source("./Models/Simple/6_biasedCoin.r")
+```
+
+# Set up simulation parameters
+```{r}
+runs = 1000
+n = 1000
+ModelNumber = c()
+Model = c()
+Run = c()
+Successes_total = c()
+Successes_A = c()
+Successes_B = c()
+Allocated_A = c()
+Allocated_B = c()
+Power = c()
+
+n0 = 5
+
+Z = rbinom(n,1,0.5) # Simulate single binary covariate
+
+SuccessProbs_known = c(0.2, 0.6)
+
+SuccessProbs = matrix(data = c(0.3, 0.1, 0.4, 0.8), nrow = 2, ncol = 2)
+```
+
+
+```{r}
+for(k in 1:runs){
+# Results
+T = length(SuccessProbs)/2
+Results = matrix(0, nrow = n, ncol = T)
+
+for (i in 1:T) {
+  Results[ , i] = rbinom(n, 1, SuccessProbs[Z+1, i]) 
+}
+
+Allocation_random = randomAllocation(n, T)
+TotalSuccesses_Random = successCount(Allocation_random, Results)
+TreamtmentSuccess_Random = successTreatmentCount(Allocation_random, Results)
+
+ModelNumber = append(Model, 1)
+Model =           append(Model, "1. Random")
+Successes_total = append(Successes_total, TotalSuccesses_Random)
+Successes_A =     append(Successes_A,TreamtmentSuccess_Random[1])
+Successes_B =     append(Successes_B,TreamtmentSuccess_Random[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_random == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_random == 2))
+Run = append(Run, k)
+
+Allocation_biasedCoin = biasedCoin(n, 1/3)
+TotalSuccesses_biasedCoin = successCount(Allocation_biasedCoin[,1], Results)
+TreamtmentSuccess_biasedCoin = successTreatmentCount(Allocation_biasedCoin[,1], Results)
+
+ModelNumber = append(Model, 6)
+Model =           append(Model, "6. Biased  coin")
+Successes_total = append(Successes_total, TotalSuccesses_biasedCoin)
+Successes_A =     append(Successes_A,TreamtmentSuccess_biasedCoin[1])
+Successes_B =     append(Successes_B,TreamtmentSuccess_biasedCoin[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_biasedCoin == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_biasedCoin == 2))
+Run = append(Run, k)
+
+# Neyman Allocations
+
+Allocation_neyamn_known = neymanKnown(n, T, Results, SuccessProbs_known)
+TotalSuccesses_neyamn_known = successCount(Allocation_neyamn_known, Results)
+TreamtmentSuccess_neyman_known= successTreatmentCount(Allocation_neyamn_known, Results)
+
+ModelNumber = append(Model, 2)
+Model =           append(Model, "2. Neyman known")
+Successes_total = append(Successes_total, TotalSuccesses_neyamn_known)
+Successes_A =     append(Successes_A,TreamtmentSuccess_neyman_known[1])
+Successes_B =     append(Successes_B,TreamtmentSuccess_neyman_known[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_neyamn_known == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_neyamn_known == 2))
+Run = append(Run, k)
+
+Allocation_RSIHR_known = RSIHRKnown(n, T, Results, SuccessProbs_known)
+TotalSuccesses_RSIHR_known = successCount(Allocation_RSIHR_known, Results)
+TreamtmentSuccess_RSIHR_known = successTreatmentCount(Allocation_RSIHR_known, Results)
+
+ModelNumber = append(Model, 3)
+Model =           append(Model, "3. RSIHR Known")
+Successes_total = append(Successes_total, TotalSuccesses_RSIHR_known)
+Successes_A =     append(Successes_A,TreamtmentSuccess_RSIHR_known[1])
+Successes_B =     append(Successes_B,TreamtmentSuccess_RSIHR_known[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_RSIHR_known == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_RSIHR_known == 2))
+Run = append(Run, k)
+
+Allocation_Rosenberger_known = RosenbergerKnown(n, T, Results, SuccessProbs_known)
+TotalSuccesses_Rosenberger_known = successCount(Allocation_Rosenberger_known, Results)
+TreamtmentSuccess_Rosenberger_known = successTreatmentCount(Allocation_Rosenberger_known, Results)
+
+ModelNumber = append(Model, 4)
+Model =           append(Model, "4. Rosenberger known")
+Successes_total = append(Successes_total, TotalSuccesses_Rosenberger_known)
+Successes_A =     append(Successes_A,TreamtmentSuccess_Rosenberger_known[1])
+Successes_B =     append(Successes_B,TreamtmentSuccess_Rosenberger_known[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_Rosenberger_known == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_Rosenberger_known == 2))
+Run = append(Run, k)
+
+Allocation_OptimalAdjusted_known = OptimalAdjustedKnown(n, T, Results, SuccessProbs_known)
+TotalSuccesses_OptimalAdjusted_known = successCount(Allocation_OptimalAdjusted_known, Results)
+TreamtmentSuccess_OptimalAdjusted_known = successTreatmentCount(Allocation_OptimalAdjusted_known, Results)
+
+ModelNumber = append(Model, 5)
+Model =           append(Model, "5. Optimal adjusted")
+Successes_total = append(Successes_total, TotalSuccesses_OptimalAdjusted_known)
+Successes_A =     append(Successes_A,TreamtmentSuccess_OptimalAdjusted_known[1])
+Successes_B =     append(Successes_B,TreamtmentSuccess_OptimalAdjusted_known[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_OptimalAdjusted_known == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_OptimalAdjusted_known == 2))
+Run = append(Run, k)
+}
+```
+
+
+```{r}
+df = data.frame(ModelNumber = ModelNumber, Model =  Model, Run = Run, Successes =  Successes_total, Successes_A =Successes_A, Successes_B = Successes_B, Allocated_A = Allocated_A, Allocated_B = Allocated_B)
+head(df)
+```
+```{r}
+dim(df)
+```
+```{r}
+library(stringr)
+write.csv2(df, file = paste("./Results/Scenario1_Random_",format(Sys.time(), "%Y%m%d"),".csv", sep = ""))
+```
+
+
+

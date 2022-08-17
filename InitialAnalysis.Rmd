@@ -5,6 +5,12 @@ output:
   html_notebook: default
 ---
 
+```{r}
+source("./Helpers/Initialise.R")
+source("./Helpers/InitialiseWCovariates.R")
+```
+
+
 # Allocation methods
 Let us start by defining functions for each allocation method
 
@@ -125,7 +131,7 @@ power = pwr.2p2n.test(h = h, n1 =  n1, n2 = n2, sig.level=0.05, alternative = "t
 
   
 # Biased Coin
-Allocation_biasedCoin = biasedCoinAllocation(n, 1/3)
+Allocation_biasedCoin = biasedCoin(n, 1/3)
 TotalSuccesses_biasedCoin = successCount(Allocation_biasedCoin[,1], Results)
 
 ```
@@ -142,6 +148,17 @@ TotalSuccesses_playTheWinner_Randomised = successCount(Allocation_playTheWinner_
 Allocation_neyamn_known = neymanKnown(n, T, Results, SuccessProbs)
 TotalSuccesses_neyamn_known = successCount(Allocation_neyamn_known, Results)
 
+Allocation_RSIHR_known = RSIHRKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_RSIHR_known = successCount(Allocation_RSIHR_known, Results)
+
+Allocation_Rosenberger_known = RosenbergerKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_Rosenberger_known = successCount(Allocation_Rosenberger_known, Results)
+
+Allocation_OptimalAdjusted_known = OptimalAdjustedKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_OptimalAdjusted_known = successCount(Allocation_OptimalAdjusted_known, Results)
+
+
+# Estimated allocations
 Allocation_neyamn_estimated = neymanEstimated_binary(n, n0, Results)
 TotalSuccesses_neyamn_estimated = successCount(Allocation_neyamn_estimated, Results)
 
@@ -183,7 +200,7 @@ setting up multi-treatment the problem
 
 ```{r}
 n = 1000 # Number of subjects
-n0 = 5
+n0 = 20
 
 Z = rbinom(n,1,0.5) # Simulate single binary covariate
 
@@ -191,6 +208,80 @@ SuccessProbs = c(0.2, 0.6, 0.8, 0.5, 0.2)
 
 SuccessProbs_Z = matrix(data = c(0.1, 0.3, 0.7, 0.1, 0.8, 0.8, 0.2, 0.8, 0.15, 0.25), nrow = 5, ncol = 2)
 
-T = 5
+# Results
+T = length(SuccessProbs)
+Results = matrix(0, nrow = n, ncol = T)
+
+for (i in 1:T) {
+  Results[ , i] = rbinom(n, 1, SuccessProbs[i]) 
+}
+```
+
+
+```{r}
+# Pure random
+Allocation_random = randomAllocation(n, T)
+TotalSuccesses_Random = successCount(Allocation_random, Results)
+
+```
+
+```{r}
+# Play the winner
+Allocation_playTheWinner = playTheWinner(n, T, Results)
+TotalSuccesses_playTheWinner = successCount(Allocation_playTheWinner, Results)
+
+
+# Neyman Allocations
+Allocation_neyamn_known = neymanKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_neyamn_known = successCount(Allocation_neyamn_known, Results)
+
+Allocation_RSIHR_known = RSIHRKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_RSIHR_known = successCount(Allocation_RSIHR_known, Results)
+
+Allocation_Rosenberger_known = RosenbergerKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_Rosenberger_known = successCount(Allocation_Rosenberger_known, Results)
+
+Allocation_OptimalAdjusted_known = OptimalAdjustedKnown(n, T, Results, SuccessProbs)
+TotalSuccesses_OptimalAdjusted_known = successCount(Allocation_OptimalAdjusted_known, Results)
+
+Allocation_neyamn_estimated = neymanEstimated_multiple(n, n0, T, Results)
+TotalSuccesses_neyamn_estimated = successCount(Allocation_neyamn_estimated, Results)
+
+Allocation_RSHIR_multiple = RSIHR_multiple(n, n0, T, Results)
+TotalSuccesses_RSHIR_multiple = successCount(Allocation_RSHIR_multiple, Results)
+
+Allocation_Rosenberger_multiple =Rosenberger_multiple(n, n0, T, Results)
+TotalSuccesses_Rosenberger_multiple = successCount(Allocation_Rosenberger_multiple, Results)
+
+Allocation_OptimalAdjusted_multiple = OptimalAdjusted_multiple(n, n0, T, Results)
+TotalSuccesses_OptimalAdjusted_multiple = successCount(Allocation_OptimalAdjusted_multiple, Results)
+```
+
+
+```{r}
+table(Allocation_random)
+table(Allocation_biasedCoin[,1])
+table(Allocation_playTheWinner)
+table(Allocation_neyamn_known)
+table(Allocation_RSIHR_known)
+table(Allocation_Rosenberger_known)
+table(Allocation_OptimalAdjusted_known)
+table(Allocation_neyamn_estimated)
+table(Allocation_RSHIR_multiple)
+table(Allocation_Rosenberger_multiple)
+table(Allocation_OptimalAdjusted_multiple)
+
+TotalSuccesses_Random
+TotalSuccesses_biasedCoin
+TotalSuccesses_playTheWinner
+TotalSuccesses_neyamn_known
+TotalSuccesses_RSIHR_known
+TotalSuccesses_Rosenberger_known
+TotalSuccesses_OptimalAdjusted_known
+
+TotalSuccesses_neyamn_estimated
+TotalSuccesses_RSHIR_multiple
+TotalSuccesses_Rosenberger_multiple
+TotalSuccesses_OptimalAdjusted_multiple
 ```
 

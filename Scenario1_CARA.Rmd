@@ -1,0 +1,153 @@
+---
+title: "Scenario1_CARA"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r}
+# Results measures
+source("./ResultMeasures/successCount.R")
+source("./ResultMeasures/successTreatmentCount.R")
+
+# Helper files
+source("./Helpers/Initialise.R")
+source("./Helpers/InitialiseWCovariates.R")
+```
+
+# Allocation methods we will use
+
+### Coin based designs
+```{r}
+
+
+```
+
+
+### Turn based and Gittins index
+```{r}
+
+
+```
+
+### Sequential estimation techniques Two Treatments
+```{r}
+source("./Models/CARA/20_Neyman_CARA.R")
+source("./Models/CARA/21_RSIHR_CARA.R")
+source("./Models/CARA/22_Rosenberger_CARA.R")
+source("./Models/CARA/23_OptimalAdjusted_CARA.R")
+```
+
+
+# Set up simulation parameters
+```{r}
+runs = 10
+n = 1000
+ModelNumber = c()
+Model = c()
+Run = c()
+Successes_total = c()
+Successes_A = c()
+Successes_B = c()
+Allocated_A = c()
+Allocated_B = c()
+Power = c()
+
+n0 = 20
+
+Z = rbinom(n,1,0.5) # Simulate single binary covariate
+
+SuccessProbs_known = c(0.2, 0.6)
+
+SuccessProbs = matrix(data = c(0.3, 0.1, 0.4, 0.8), nrow = 2, ncol = 2)
+```
+
+
+```{r}
+for(k in 1:runs){
+# Results
+T = length(SuccessProbs)/2
+Results = matrix(0, nrow = n, ncol = T)
+
+for (i in 1:T) {
+  Results[ , i] = rbinom(n, 1, SuccessProbs[Z+1, i]) 
+}
+
+# Estimated allocations
+Allocation_neyman_estimated = NeymanCara(n, n0, Z, Results)
+TotalSuccesses_neyman_estimated = successCount(Allocation_neyman_estimated, Results)
+TotalTreatmentSuccesses_neyman_estimated = successTreatmentCount(Allocation_neyman_estimated, Results)
+
+ModelNumber = append(Model, 20)
+Model =           append(Model, "20. Neyman CARA")
+Successes_total = append(Successes_total, TotalSuccesses_neyman_estimated)
+Successes_A =     append(Successes_A,TotalTreatmentSuccesses_neyman_estimated[1])
+Successes_B =     append(Successes_B,TotalTreatmentSuccesses_neyman_estimated[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_neyman_estimated == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_neyman_estimated == 2))
+Run = append(Run, k)
+
+Allocation_RSIHR_estimated = RSIHRCara(n, n0, Z, Results)
+TotalSuccesses_RSIHR_estimated = successCount(Allocation_RSIHR_estimated, Results)
+TotalTreatmentSuccesses_RSIHR_estimated = successTreatmentCount(Allocation_RSIHR_estimated, Results)
+
+ModelNumber = append(Model, 20)
+Model =           append(Model, "20. Neyman CARA")
+Successes_total = append(Successes_total, TotalSuccesses_RSIHR_estimated)
+Successes_A =     append(Successes_A,TotalTreatmentSuccesses_RSIHR_estimated[1])
+Successes_B =     append(Successes_B,TotalTreatmentSuccesses_RSIHR_estimated[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_RSIHR_estimated == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_RSIHR_estimated == 2))
+Run = append(Run, k)
+
+
+Allocation_Rosenberger_estimated = RosenbergerCara(n, n0, Z, Results)
+TotalSuccesses_Rosenberger_estimated = successCount(Allocation_Rosenberger_estimated, Results)
+TotalTreatmentSuccesses_Rosenberger_estimated = successTreatmentCount(Allocation_Rosenberger_estimated, Results)
+
+ModelNumber = append(Model, 20)
+Model =           append(Model, "20. Neyman CARA")
+Successes_total = append(Successes_total, TotalSuccesses_Rosenberger_estimated)
+Successes_A =     append(Successes_A,TotalTreatmentSuccesses_Rosenberger_estimated[1])
+Successes_B =     append(Successes_B,TotalTreatmentSuccesses_Rosenberger_estimated[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_Rosenberger_estimated == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_Rosenberger_estimated == 2))
+Run = append(Run, k)
+
+
+
+Allocation_OptimalAdjusted_estimated = OptimalAdjustedCara(n, n0, Z, Results)
+TotalSuccesses_OptimalAdjusted_estimated = successCount(Allocation_OptimalAdjusted_estimated, Results)
+TotalTreatmentSuccesses_OptimalAdjusted_estimated = successTreatmentCount(Allocation_OptimalAdjusted_estimated, Results)
+
+ModelNumber = append(Model, 20)
+Model =           append(Model, "20. Neyman CARA")
+Successes_total = append(Successes_total, TotalSuccesses_OptimalAdjusted_estimated)
+Successes_A =     append(Successes_A,TotalTreatmentSuccesses_OptimalAdjusted_estimated[1])
+Successes_B =     append(Successes_B,TotalTreatmentSuccesses_OptimalAdjusted_estimated[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_OptimalAdjusted_estimated == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_OptimalAdjusted_estimated == 2))
+Run = append(Run, k)
+
+
+}
+```
+
+
+```{r}
+df = data.frame(ModelNumber = ModelNumber, Model =  Model, Run = Run, Successes =  Successes_total, Successes_A =Successes_A, Successes_B = Successes_B, Allocated_A = Allocated_A, Allocated_B = Allocated_B)
+head(df)
+```
+
+```{r}
+dim(df)
+```
+
+## Write results to file
+```{r}
+library(stringr)
+write.csv2(df, file = paste("./Results/Scenario1_CARA_",format(Sys.time(), "%Y%m%d"),".csv", sep = ""))
+```
+
+
+

@@ -1,17 +1,17 @@
 neymanEstimated_multiple <- function(n, n0, T, Results){
-  Allocation = rep(0,n)
   p = rep(0,T)
   q = rep(0,T)
   
   #First initialise by assigning no to each treatment
-  for (t in 1:T) {
-    Allocation[(n0*(t-1)+1):(t*n0)] = t
-  }
+  Allocation = Initialise(n, n0, T, Results)
+  counter = sum(Allocation != 0)  
   
   
-  for (i in (T*n0+1):n) {
+  for (i in (counter+1):n) {
     for (j in 1:T) {
-      p[j] = mean(Results[Allocation[1:(i-1)] == 1 ,j])
+      Res = Results[1:(i-1), ]
+      All = Allocation[1:(i-1)]
+      p[j] = mean(Res[All == j ,j])
       q[j] = 1 - p[j]
     }
     denom = sum(sqrt(p*q))

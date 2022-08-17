@@ -8,7 +8,7 @@ doublyBiasedCoinAllocation <- function(n, n0, T, Results){
   
   for (t in t*no+1:n) {
     q[i] = 
-      Allocation[i] = 2 - (runif(1)<= q[i])
+    Allocation[i] = 2 - (runif(1)<= q[i])
     
     return(Allocation)
   }

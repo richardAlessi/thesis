@@ -1,0 +1,193 @@
+---
+title: "Scenario1_ResponseAdaptive"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r}
+# Results measures
+source("./ResultMeasures/successCount.R")
+source("./ResultMeasures/successTreatmentCount.R")
+
+# Helper files
+source("./Helpers/Initialise.R")
+source("./Helpers/InitialiseWCovariates.R")
+```
+
+# Allocation methods we will use
+
+### Coin based designs
+```{r}
+source("./Models/RA/7_DoublyBiasedCoin.r")
+
+```
+
+
+### Turn based and Gittins index
+```{r}
+source("./Models/RA/8_PlayTheWinner.R")
+source("./Models/RA/9_PlayTheWinnerRandomised_2T.R")
+source("./Models/RA/11_gittinsIndex.R") # Not working yet
+
+
+```
+
+### Sequential estimation techniques Two Treatments
+```{r}
+source("./Models/RA/12_NeymanEstimated_binary.R")
+source("./Models/RA/13_RSIHR_binary.R")
+source("./Models/RA/14_Rosenberger_binary.R")
+source("./Models/RA/15_OptimalAdjusted_binary.R")
+```
+
+
+# Set up simulation parameters
+```{r}
+runs = 1000
+n = 1000
+ModelNumber = c()
+Model = c()
+Run = c()
+Successes_total = c()
+Successes_A = c()
+Successes_B = c()
+Allocated_A = c()
+Allocated_B = c()
+Power = c()
+
+n0 = 5
+
+Z = rbinom(n,1,0.5) # Simulate single binary covariate
+
+SuccessProbs_known = c(0.2, 0.6)
+
+SuccessProbs = matrix(data = c(0.3, 0.1, 0.4, 0.8), nrow = 2, ncol = 2)
+```
+
+
+```{r}
+for(k in 1:runs){
+# Results
+T = length(SuccessProbs)/2
+Results = matrix(0, nrow = n, ncol = T)
+
+for (i in 1:T) {
+  Results[ , i] = rbinom(n, 1, SuccessProbs[Z+1, i]) 
+}
+
+# Doubly biased coin
+Allocation_DBCA = doublyBiasedCoinAllocation(n, n0, T, Results)
+TotalSuccesses_DBCA = successCount(Allocation_playTheWinner, Results)
+TotalTreatmentSuccesses_DBCA = successTreatmentCount(Allocation_playTheWinner, Results)
+
+ModelNumber = append(Model, 7)
+Model =           append(Model, "7. Doubly biased coin allocation")
+Successes_total = append(Successes_total, TotalSuccesses_DBCA)
+Successes_A =     append(Successes_A,TotalTreatmentSuccesses_DBCA[1])
+Successes_B =     append(Successes_B,TotalTreatmentSuccesses_DBCA[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_DBCA == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_DBCA == 2))
+Run = append(Run, k)
+
+
+# Play the winner
+Allocation_playTheWinner = playTheWinner(n, T, Results)
+TotalSuccesses_playTheWinner = successCount(Allocation_playTheWinner, Results)
+TotalTreatmentSuccesses_playTheWinner = successTreatmentCount(Allocation_playTheWinner, Results)
+
+ModelNumber = append(Model, 8)
+Model =           append(Model, "8. Play the winner")
+Successes_total = append(Successes_total, TotalSuccesses_playTheWinner)
+Successes_A =     append(Successes_A,TotalTreatmentSuccesses_playTheWinner[1])
+Successes_B =     append(Successes_B,TotalTreatmentSuccesses_playTheWinner[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_playTheWinner == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_playTheWinner == 2))
+Run = append(Run, k)
+
+Allocation_playTheWinner_Randomised = playTheWinnerRandomised_2T(n, Results, 1, 1)
+TotalSuccesses_playTheWinner_Randomised = successCount(Allocation_playTheWinner_Randomised[,1], Results)
+TotalTreatmentSuccesses_playTheWinner_Randomised = successTreatmentCount(Allocation_playTheWinner_Randomised[,1], Results)
+
+ModelNumber = append(Model, 9)
+Model =           append(Model, "9. Play the winner randomised 2T")
+Successes_total = append(Successes_total, TotalSuccesses_playTheWinner_Randomised)
+Successes_A =     append(Successes_A,TotalTreatmentSuccesses_playTheWinner_Randomised[1])
+Successes_B =     append(Successes_B,TotalTreatmentSuccesses_playTheWinner_Randomised[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_playTheWinner_Randomised == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_playTheWinner_Randomised == 2))
+Run = append(Run, k)
+
+# Estimated allocations
+Allocation_neyamn_estimated = neymanEstimated_binary(n, n0, Results)
+TotalSuccesses_neyamn_estimated = successCount(Allocation_neyamn_estimated, Results)
+TotalTreatmentSuccesses_neyamn_estimated = successTreatmentCount(Allocation_neyamn_estimated, Results)
+
+ModelNumber = append(Model, 12)
+Model =           append(Model, "12. Neyman estimated binary")
+Successes_total = append(Successes_total, TotalSuccesses_neyamn_estimated)
+Successes_A =     append(Successes_A,TotalTreatmentSuccesses_neyamn_estimated[1])
+Successes_B =     append(Successes_B,TotalTreatmentSuccesses_neyamn_estimated[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_neyamn_estimated == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_neyamn_estimated == 2))
+Run = append(Run, k)
+
+
+Allocation_RSHIR_binary = RSIHR_binary(n, n0, Results)
+TotalSuccesses_RSHIR_binary = successCount(Allocation_RSHIR_binary, Results)
+TotalTreatmentSuccesses_RSHIR_binary = successTreatmentCount(Allocation_RSHIR_binary, Results)
+
+ModelNumber = append(Model, 13)
+Model =           append(Model, "13. RSHIR estimated binary")
+Successes_total = append(Successes_total, TotalSuccesses_RSHIR_binary)
+Successes_A =     append(Successes_A,TotalTreatmentSuccesses_RSHIR_binary[1])
+Successes_B =     append(Successes_B,TotalTreatmentSuccesses_RSHIR_binary[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_RSHIR_binary == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_RSHIR_binary == 2))
+Run = append(Run, k)
+
+
+Allocation_Rosenberger_binary =Rosenberger_binary(n, n0, Results)
+TotalSuccesses_Rosenberger_binary = successCount(Allocation_Rosenberger_binary, Results)
+TotalTreatmentSuccesses_Rosenberger_binary = successTreatmentCount(Allocation_Rosenberger_binary, Results)
+
+ModelNumber = append(Model, 14)
+Model =           append(Model, "14. Rosenberger estimated binary")
+Successes_total = append(Successes_total, TotalSuccesses_Rosenberger_binary)
+Successes_A =     append(Successes_A,TotalTreatmentSuccesses_Rosenberger_binary[1])
+Successes_B =     append(Successes_B,TotalTreatmentSuccesses_Rosenberger_binary[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_Rosenberger_binary == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_Rosenberger_binary == 2))
+Run = append(Run, k)
+
+
+Allocation_OptimalAdjusted_binary = OptimalAdjusted_binary(n, n0, Results)
+TotalSuccesses_OptimalAdjusted_binary = successCount(Allocation_OptimalAdjusted_binary, Results)
+TotalTreatmentSuccesses_OptimalAdjusted_binary = successTreatmentCount(Allocation_OptimalAdjusted_binary, Results)
+
+ModelNumber = append(Model, 15)
+Model =           append(Model, "15. Optimal adjusted binary")
+Successes_total = append(Successes_total, TotalSuccesses_OptimalAdjusted_binary)
+Successes_A =     append(Successes_A,TotalTreatmentSuccesses_OptimalAdjusted_binary[1])
+Successes_B =     append(Successes_B,TotalTreatmentSuccesses_OptimalAdjusted_binary[2])
+Allocated_A =     append(Allocated_A, sum(Allocation_OptimalAdjusted_binary == 1))
+Allocated_B =     append(Allocated_B, sum(Allocation_OptimalAdjusted_binary == 2))
+Run = append(Run, k)
+}
+```
+
+
+```{r}
+df = data.frame(ModelNumber = ModelNumber, Model =  Model, Run = Run, Successes =  Successes_total, Successes_A =Successes_A, Successes_B = Successes_B, Allocated_A = Allocated_A, Allocated_B = Allocated_B)
+head(df)
+```
+```{r}
+dim(df)
+```
+```{r}
+library(stringr)
+write.csv2(df, file = paste("./Results/Scenario1_RA_",format(Sys.time(), "%Y%m%d"),".csv", sep = ""))
+```
+
+
+
