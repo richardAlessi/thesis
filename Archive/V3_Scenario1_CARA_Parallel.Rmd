@@ -1,0 +1,151 @@
+---
+title: "Scenario1_ResponseAdaptive"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+```{r}
+library(stringr)
+library(foreach)
+library(parallel)
+library(iterators)
+library(doParallel)
+```
+
+
+```{r}
+# Results measures
+source("./ResultMeasures/successCount.R")
+source("./ResultMeasures/successTreatmentCount.R")
+
+# Helper files
+source("./Helpers/Initialise_RR.R")
+source("./Helpers/InitialiseWCovariates_RR.R")
+source("./Helpers/PowerWCovariates.R")
+source("./Helpers/DBCD_G_Multi_Function.R")
+```
+
+# Allocation methods we will use
+
+### Coin based designs
+```{r}
+source("./NewModels/2_CARA.r")
+```
+
+# Set up simulation parameters
+```{r}
+runs = 300
+n_s = c(30,40,50,60,70,80,90,100,200,300,400, 500, 1000)
+n0 = 3
+
+SuccessProbs_known = c(0.45, 0.6)
+
+SuccessProbs = matrix(data = c(0.3, 0.6, 0.7, 0.5), nrow = 2, ncol = 2)
+
+c_gamma = 3
+
+Model_allocations = c("Neyman", "RSIHR", "Rosenberger", "OptimallyAdjusted")
+Model_estimations = c("Known", "Estimated", "DBCD")
+```
+
+```{r}
+RunModel <- function(AllocationMethod, EstimationMethod, n, n0, Z, Results, k, p_known, gam){
+  Allocation = CARA(Results, n0, Z, AllocationMethod = AllocationMethod, EstimationMethod = EstimationMethod, p_known =  p_known, gam = gam)
+  TotalSuccesses = successCount(Allocation, Results)
+  TotalTreatmentSuccesses = successTreatmentCount(Allocation, Results)
+  
+  df_update = c(paste("CARA", EstimationMethod, AllocationMethod, sep = "_"),
+                k,
+                TotalSuccesses,
+                TotalTreatmentSuccesses[1],
+                TotalTreatmentSuccesses[2],
+                sum(Allocation == 1),
+                sum(Allocation == 2),
+                PowerWCovariates(p_known, Allocation, alpha = 0.05, Z)
+                )
+  return(data.frame(t(df_update)))
+}
+```
+
+
+
+```{r}
+
+runSims = function(k, n, n0, SuccessProbs, c_gamma) {
+  
+  df = data.frame(
+    Model = character(),
+    Run = integer(),
+    Successes_total = integer(),
+    Successes_A = integer(),
+    Successes_B = integer(),
+    Allocated_A = integer(),
+    Allocated_B = integer(),
+    Power = double()
+  )
+
+  # Results
+  Tr = dim(SuccessProbs)[2]
+  Results = matrix(0, nrow = n, ncol = Tr)
+  Z = rbinom(n,1,0.5) # Simulate single binary covariate
+
+  for (i in 1:Tr) {
+    Results[ , i] = rbinom(n, 1, SuccessProbs[Z+1, i]) 
+  }
+
+# Run remaining models
+  for (AM in Model_allocations) {
+    for (EM in Model_estimations) {
+      df[nrow(df)+1,] = RunModel(AllocationMethod = AM, EstimationMethod = EM, n, n0, Z, Results, k, p_known = SuccessProbs, gam = c_gamma)
+    }
+    
+  }
+ return(df)
+}
+
+
+```
+
+
+```{r}
+numCores <- parallel::detectCores() # Requires library(parallel)
+cl = makeCluster(numCores)
+registerDoParallel(cl)
+print(numCores)
+```
+
+
+
+
+```{r}
+start_time <- Sys.time()
+resultsCombined = foreach(k = 1:runs, .combine = rbind) %dopar% {
+  res = c()
+  for (n in n_s) {
+    res = rbind(res, runSims(k, n, n0, SuccessProbs, c_gamma))
+  }
+  return(res)
+}
+
+end_time <- Sys.time()
+
+end_time - start_time
+```
+
+```{r}
+stopCluster(cl)
+```
+
+```{r}
+write.csv(resultsCombined, file = paste("./V2_Results/Scenario_1_CARA_",format(Sys.time(), "%Y%m%d"),".csv", sep = ""))
+```
+
+
+```{r}
+res = c()
+res = rbind(res, runSims(1, 100, 5, SuccessProbs, c_gamma))
+```
+```{r}
+RunModel(AllocationMethod = "Neyman", EstimationMethod = "Estimated", n, n0, Z, Results, 1, p_known = SuccessProbs, gam = c_gamma)
+```
+

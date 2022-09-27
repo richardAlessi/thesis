@@ -1,0 +1,81 @@
+---
+title: "Analysis of thesis results"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+
+
+```{r}
+df <- read.csv("C:/Users/richa/Desktop/Thesis/Code/thesis/V2_Results/Scenario_1_All_full_run_20220923.csv")
+summary(df)
+```
+
+
+```{r}
+n = dim(df)[1]
+Tr = 2
+Allocation_by_treatment = matrix(0, nrow = n, ncol = Tr)
+for (i in 1:n) {
+Allocation_by_treatment[i,1:Tr] = eval(parse(text = df$Allocation_by_treatment[i]))  
+}
+colnames(Allocation_by_treatment) = c("Allocated_A", "Allocated_B")
+df2 = bind_cols(df, Allocation_by_treatment)
+df2 = mutate(df2, Perc_A = Allocated_A/Sample_size)
+```
+
+```{r}
+Z0_Allocation_by_treatment = matrix(0, nrow = n, ncol = Tr)
+for (i in 1:n) {
+Z0_Allocation_by_treatment[i,1:Tr] = eval(parse(text = df$Z0_Allocation_by_treatment[i]))  
+}
+colnames(Z0_Allocation_by_treatment) = c("Z0_Allocated_A", "Z0_Allocated_B")
+df2 = bind_cols(df2, Z0_Allocation_by_treatment)
+df2 = mutate(df2, Z0_Perc_A = Z0_Allocated_A/Sample_size)
+```
+
+```{r}
+ggplot(data = df[df$Sample_size == 1000,], aes(Model, Successes_total), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+```{r}
+ggplot(data = df2[df2$Sample_size == 1000,], aes(Model, Power), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+
+
+```{r}
+ggplot(data = df2[df2$Sample_size == 100,], aes(Model, Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r}
+ggplot(data = df2[df2$Sample_size == 1000,], aes(Model, Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+
+
+```{r}
+ggplot(data = df2[df2$Model == "RA_DBCD_RSIHR",], aes(as.factor(Sample_size), Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ggsave("C:/Users/richa/Desktop/Thesis/Code/thesis/Images/RA_DBCD_RSIHR_PercentAllocatedA.pdf", device = "pdf")
+```
+
+
+```{r}
+ggplot(data = df2[df2$Sample_size == 300,], aes(Model, Z0_Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+
+

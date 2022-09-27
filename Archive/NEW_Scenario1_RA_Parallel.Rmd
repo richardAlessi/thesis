@@ -1,0 +1,314 @@
+---
+title: "Scenario1_ResponseAdaptive"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+```{r}
+library(stringr)
+
+library(parallel)
+library(iterators)
+library(doParallel)
+```
+
+```{r}
+# Results measures
+source("./ResultMeasures/successCount.R")
+source("./ResultMeasures/successTreatmentCount.R")
+
+# Helper files
+source("./Helpers/Initialise.R")
+source("./Helpers/InitialiseWCovariates.R")
+```
+
+# Allocation methods we will use
+
+### Coin based designs
+```{r}
+source("./NewModels/1_ResponseAdaptive.r")
+```
+
+# Set up simulation parameters
+```{r}
+runs = 1000
+n = 1000
+n0 = 5
+
+Z = rbinom(n,1,0.5) # Simulate single binary covariate
+
+SuccessProbs_known = c(0.2, 0.6)
+
+SuccessProbs = matrix(data = c(0.3, 0.1, 0.4, 0.8), nrow = 2, ncol = 2)
+
+c_gamma = 3
+
+Model_allocations = c("Known", "Estimated", "DBCD")
+Model_estimations = c("Neyman", "RSIHR", "Rosenberger", "OptimallyAdjusted")
+```
+
+
+```{r}
+
+
+runSims = function(k, n, n0, Z, T, Results, SuccessProbs_known) {
+  
+  df = data.frame(
+    Model = character(),
+    Run = integer(),
+    Successes_total = integer(),
+    Successes_A = integer(),
+    Successes_B = integer(),
+    Allocated_A = integer(),
+    Allocated_B = integer(),
+    Power = double()
+  )
+
+  # Results
+  T = length(SuccessProbs)/2
+  Results = matrix(0, nrow = n, ncol = T)
+  
+RunModel <- function(AllocationMethod, EstimationMethod, n, n0, Results, k){
+  Allocation = ResponseAdaptive(n, n0, Results, AllocationMethod = AllocationMethod, EstimationMethod = EstimationMethod )
+  TotalSuccesses = successCount(Allocation, Results)
+  TotalTreatmentSuccesses = successTreatmentCount(Allocation, Results)
+  
+  df_update = c(paste("RA", EstimationMethod, AllocationMethod, sep = "_"),
+                k,
+                TotalSuccesses,
+                TotalTreatmentSuccesses[1],
+                TotalTreatmentSuccesses[2],
+                sum(Allocation == 1),
+                sum(Allocation == 2),
+                0
+                )
+  return(data.frame(t(df_update)))
+}
+  
+  
+  
+    for (i in 1:T) {
+    Results[ , i] = rbinom(n, 1, SuccessProbs[Z+1, i]) 
+    }
+
+# Run random model
+  df[nrow(df)+1,] = RunModel(AllocationMethod = "Random", EstimationMethod = NULL, n, n0, Results, k)
+ 
+  
+# Run remaining models
+  for (AM in Model_allocations) {
+    for (EM in Model_estimations) {
+      df[nrow(df)+1,] = RunModel(AllocationMethod = AM, EstimationMethod = EM, n, n0, Results, k)
+    }
+    
+  }
+  
+  ## Model 2: Neyman Known
+  Allocation_NeymanKnown = ResponseAdaptive(n, n0, Results, AllocationMethod = "Neyman", EstimationMethod = "Known", p_known = SuccessProbs_known)
+  TotalSuccesses_NeymanKnown = successCount(Allocation_NeymanKnown, Results)
+  TotalTreatmentSuccesses_NeymanKnown = successTreatmentCount(Allocation_NeymanKnown, Results)
+  
+  ModelNumber = append(Model, 2)
+  Model =           append(Model, "2. NeymanKnown")
+  Successes_total = append(Successes_total, TotalSuccesses_NeymanKnown)
+  Successes_A =     append(Successes_A,TotalTreatmentSuccesses_NeymanKnown[1])
+  Successes_B =     append(Successes_B,TotalTreatmentSuccesses_NeymanKnown[2])
+  Allocated_A =     append(Allocated_A, sum(Allocation_NeymanKnown == 1))
+  Allocated_B =     append(Allocated_B, sum(Allocation_NeymanKnown == 2))
+  Run = append(Run, k)
+  
+  ## Model 3: RSIHR Known
+  Allocation_RSIHRKnown = ResponseAdaptive(n, n0, Results, AllocationMethod = "RSIHR", EstimationMethod = "Known", p_known = SuccessProbs_known)
+  TotalSuccesses_RSIHRKnown = successCount(Allocation_RSIHRKnown, Results)
+  TotalTreatmentSuccesses_RSIHRKnown = successTreatmentCount(Allocation_RSIHRKnown, Results)
+  
+  ModelNumber = append(Model, 3)
+  Model =           append(Model, "3. RSIHRKnown")
+  Successes_total = append(Successes_total, TotalSuccesses_RSIHRKnown)
+  Successes_A =     append(Successes_A,TotalTreatmentSuccesses_RSIHRKnown[1])
+  Successes_B =     append(Successes_B,TotalTreatmentSuccesses_RSIHRKnown[2])
+  Allocated_A =     append(Allocated_A, sum(Allocation_RSIHRKnown == 1))
+  Allocated_B =     append(Allocated_B, sum(Allocation_RSIHRKnown == 2))
+  Run = append(Run, k)
+  
+  ## Model 4: Rosenberger Known
+  Allocation_RosenbergerKnown = ResponseAdaptive(n, n0, Results, AllocationMethod = "Rosenberger", EstimationMethod = "Known", p_known = SuccessProbs_known)
+  TotalSuccesses_RosenbergerKnown = successCount(Allocation_RosenbergerKnown, Results)
+  TotalTreatmentSuccesses_RosenbergerKnown = successTreatmentCount(Allocation_RosenbergerKnown, Results)
+  
+  ModelNumber = append(Model, 4)
+  Model =           append(Model, "4. RosenbergerKnown")
+  Successes_total = append(Successes_total, TotalSuccesses_RosenbergerKnown)
+  Successes_A =     append(Successes_A,TotalTreatmentSuccesses_RosenbergerKnown[1])
+  Successes_B =     append(Successes_B,TotalTreatmentSuccesses_RosenbergerKnown[2])
+  Allocated_A =     append(Allocated_A, sum(Allocation_RosenbergerKnown == 1))
+  Allocated_B =     append(Allocated_B, sum(Allocation_RosenbergerKnown == 2))
+  Run = append(Run, k)
+  
+  ## Model 5: Optimally adjusted Known
+  Allocation_OptimallyAdjustedKnown = ResponseAdaptive(n, n0, Results, AllocationMethod = "OptimallyAdjusted", EstimationMethod = "Known", p_known = SuccessProbs_known)
+  TotalSuccesses_OptimallyAdjustedKnown = successCount(Allocation_OptimallyAdjustedKnown, Results)
+  TotalTreatmentSuccesses_OptimallyAdjustedKnown = successTreatmentCount(Allocation_OptimallyAdjustedKnown, Results)
+  
+  ModelNumber = append(Model, 5)
+  Model =           append(Model, "5. OptimallyAdjustedKnown")
+  Successes_total = append(Successes_total, TotalSuccesses_OptimallyAdjustedKnown)
+  Successes_A =     append(Successes_A,TotalTreatmentSuccesses_OptimallyAdjustedKnown[1])
+  Successes_B =     append(Successes_B,TotalTreatmentSuccesses_OptimallyAdjustedKnown[2])
+  Allocated_A =     append(Allocated_A, sum(Allocation_OptimallyAdjustedKnown == 1))
+  Allocated_B =     append(Allocated_B, sum(Allocation_OptimallyAdjustedKnown == 2))
+  Run = append(Run, k)
+  
+  ## Model 6: Neyman Estimated
+  Allocation_NeymanEstimated = ResponseAdaptive(n, n0, Results, AllocationMethod = "Neyman", EstimationMethod = "Estimated")
+  TotalSuccesses_NeymanEstimated = successCount(Allocation_NeymanEstimated, Results)
+  TotalTreatmentSuccesses_NeymanEstimated = successTreatmentCount(Allocation_NeymanEstimated, Results)
+  
+  ModelNumber = append(Model, 6)
+  Model =           append(Model, "6. NeymanEstimated")
+  Successes_total = append(Successes_total, TotalSuccesses_NeymanEstimated)
+  Successes_A =     append(Successes_A,TotalTreatmentSuccesses_NeymanEstimated[1])
+  Successes_B =     append(Successes_B,TotalTreatmentSuccesses_NeymanEstimated[2])
+  Allocated_A =     append(Allocated_A, sum(Allocation_NeymanEstimated == 1))
+  Allocated_B =     append(Allocated_B, sum(Allocation_NeymanEstimated == 2))
+  Run = append(Run, k)
+  
+  ## Model 7: RSIHR Estimated
+  Allocation_RSIHREstimated = ResponseAdaptive(n, n0, Results, AllocationMethod = "RSIHR", EstimationMethod = "Estimated")
+  TotalSuccesses_RSIHREstimated = successCount(Allocation_RSIHREstimated, Results)
+  TotalTreatmentSuccesses_RSIHREstimated = successTreatmentCount(Allocation_RSIHREstimated, Results)
+  
+  ModelNumber = append(Model, 7)
+  Model =           append(Model, "7. RSIHREstimated")
+  Successes_total = append(Successes_total, TotalSuccesses_RSIHREstimated)
+  Successes_A =     append(Successes_A,TotalTreatmentSuccesses_RSIHREstimated[1])
+  Successes_B =     append(Successes_B,TotalTreatmentSuccesses_RSIHREstimated[2])
+  Allocated_A =     append(Allocated_A, sum(Allocation_RSIHREstimated == 1))
+  Allocated_B =     append(Allocated_B, sum(Allocation_RSIHREstimated == 2))
+  Run = append(Run, k)
+  
+  ## Model 8: Rosenberger Estimated
+  Allocation_RosenbergerEstimated = ResponseAdaptive(n, n0, Results, AllocationMethod = "Rosenberger", EstimationMethod = "Estimated")
+  TotalSuccesses_RosenbergerEstimated = successCount(Allocation_RosenbergerEstimated, Results)
+  TotalTreatmentSuccesses_RosenbergerEstimated = successTreatmentCount(Allocation_RosenbergerEstimated, Results)
+  
+  ModelNumber = append(Model, 8)
+  Model =           append(Model, "8. RosenbergerEstimated")
+  Successes_total = append(Successes_total, TotalSuccesses_RosenbergerEstimated)
+  Successes_A =     append(Successes_A,TotalTreatmentSuccesses_RosenbergerEstimated[1])
+  Successes_B =     append(Successes_B,TotalTreatmentSuccesses_RosenbergerEstimated[2])
+  Allocated_A =     append(Allocated_A, sum(Allocation_RosenbergerEstimated == 1))
+  Allocated_B =     append(Allocated_B, sum(Allocation_RosenbergerEstimated == 2))
+  Run = append(Run, k)
+  
+  ## Model 9: Optimally adjusted Estimated
+  Allocation_OptimallyAdjustedEstimated = ResponseAdaptive(n, n0, Results, AllocationMethod = "OptimallyAdjusted", EstimationMethod = "Estimated")
+  TotalSuccesses_OptimallyAdjustedEstimated = successCount(Allocation_OptimallyAdjustedEstimated, Results)
+  TotalTreatmentSuccesses_OptimallyAdjustedEstimated = successTreatmentCount(Allocation_OptimallyAdjustedEstimated, Results)
+  
+  ModelNumber = append(Model, 9)
+  Model =           append(Model, "9. OptimallyAdjustedEstimated")
+  Successes_total = append(Successes_total, TotalSuccesses_OptimallyAdjustedEstimated)
+  Successes_A =     append(Successes_A,TotalTreatmentSuccesses_OptimallyAdjustedEstimated[1])
+  Successes_B =     append(Successes_B,TotalTreatmentSuccesses_OptimallyAdjustedEstimated[2])
+  Allocated_A =     append(Allocated_A, sum(Allocation_OptimallyAdjustedEstimated == 1))
+  Allocated_B =     append(Allocated_B, sum(Allocation_OptimallyAdjustedEstimated == 2))
+  Run = append(Run, k)
+  
+  ## Model 10: Neyman DBCD
+  Allocation_NeymanDBCD = ResponseAdaptive(n, n0, Results, AllocationMethod = "Neyman", EstimationMethod = "DBCD", gam = c_gamma)
+  TotalSuccesses_NeymanDBCD = successCount(Allocation_NeymanDBCD, Results)
+  TotalTreatmentSuccesses_NeymanDBCD = successTreatmentCount(Allocation_NeymanDBCD, Results)
+  
+  ModelNumber = append(Model, 10)
+  Model =           append(Model, "10. NeymanDBCD")
+  Successes_total = append(Successes_total, TotalSuccesses_NeymanDBCD)
+  Successes_A =     append(Successes_A,TotalTreatmentSuccesses_NeymanDBCD[1])
+  Successes_B =     append(Successes_B,TotalTreatmentSuccesses_NeymanDBCD[2])
+  Allocated_A =     append(Allocated_A, sum(Allocation_NeymanDBCD == 1))
+  Allocated_B =     append(Allocated_B, sum(Allocation_NeymanDBCD == 2))
+  Run = append(Run, k)
+  
+  ## Model 11: RSIHR DBCD
+  Allocation_RSIHRDBCD = ResponseAdaptive(n, n0, Results, AllocationMethod = "RSIHR", EstimationMethod = "DBCD", gam = c_gamma)
+  TotalSuccesses_RSIHRDBCD = successCount(Allocation_RSIHRDBCD, Results)
+  TotalTreatmentSuccesses_RSIHRDBCD = successTreatmentCount(Allocation_RSIHRDBCD, Results)
+  
+  ModelNumber = append(Model, 11)
+  Model =           append(Model, "11. RSIHRDBCD")
+  Successes_total = append(Successes_total, TotalSuccesses_RSIHRDBCD)
+  Successes_A =     append(Successes_A,TotalTreatmentSuccesses_RSIHRDBCD[1])
+  Successes_B =     append(Successes_B,TotalTreatmentSuccesses_RSIHRDBCD[2])
+  Allocated_A =     append(Allocated_A, sum(Allocation_RSIHRDBCD == 1))
+  Allocated_B =     append(Allocated_B, sum(Allocation_RSIHRDBCD == 2))
+  Run = append(Run, k)
+  
+  ## Model 12: Rosenberger DBCD
+  Allocation_RosenbergerDBCD = ResponseAdaptive(n, n0, Results, AllocationMethod = "Rosenberger", EstimationMethod = "DBCD", gam = c_gamma)
+  TotalSuccesses_RosenbergerDBCD = successCount(Allocation_RosenbergerDBCD, Results)
+  TotalTreatmentSuccesses_RosenbergerDBCD = successTreatmentCount(Allocation_RosenbergerDBCD, Results)
+  
+  ModelNumber = append(Model, 12)
+  Model =           append(Model, "12. RosenbergerDBCD")
+  Successes_total = append(Successes_total, TotalSuccesses_RosenbergerDBCD)
+  Successes_A =     append(Successes_A,TotalTreatmentSuccesses_RosenbergerDBCD[1])
+  Successes_B =     append(Successes_B,TotalTreatmentSuccesses_RosenbergerDBCD[2])
+  Allocated_A =     append(Allocated_A, sum(Allocation_RosenbergerDBCD == 1))
+  Allocated_B =     append(Allocated_B, sum(Allocation_RosenbergerDBCD == 2))
+  Run = append(Run, k)
+  
+  ## Model 13: Optimally Adjusted DBCD
+  Allocation_OptimallyAdjustedDBCD = ResponseAdaptive(n, n0, Results, AllocationMethod = "OptimallyAdjusted", EstimationMethod = "DBCD", gam = c_gamma)
+  TotalSuccesses_OptimallyAdjustedDBCD = successCount(Allocation_OptimallyAdjustedDBCD, Results)
+  TotalTreatmentSuccesses_OptimallyAdjustedDBCD = successTreatmentCount(Allocation_OptimallyAdjustedDBCD, Results)
+  
+  ModelNumber = append(Model, 13)
+  Model =           append(Model, "13. OptimallyAdjustedDBCD")
+  Successes_total = append(Successes_total, TotalSuccesses_OptimallyAdjustedDBCD)
+  Successes_A =     append(Successes_A,TotalTreatmentSuccesses_OptimallyAdjustedDBCD[1])
+  Successes_B =     append(Successes_B,TotalTreatmentSuccesses_OptimallyAdjustedDBCD[2])
+  Allocated_A =     append(Allocated_A, sum(Allocation_OptimallyAdjustedDBCD == 1))
+  Allocated_B =     append(Allocated_B, sum(Allocation_OptimallyAdjustedDBCD == 2))
+  Run = append(Run, k)
+  
+  df = data.frame(ModelNumber = ModelNumber, Model =  Model, Run = Run, Successes =  Successes_total, Successes_A =Successes_A, Successes_B = Successes_B, Allocated_A = Allocated_A, Allocated_B = Allocated_B)
+
+  return(df)
+}
+
+
+```
+
+
+```{r}
+numCores <- parallel::detectCores() # Requires library(parallel)
+cl = makeCluster(numCores)
+registerDoParallel(cl)
+print(numCores)
+```
+
+
+
+
+```{r}
+start_time <- Sys.time()
+
+resultsCombined = foreach(k = 1:runs, .combine = rbind) %dopar% {
+    runSims(k, n, n0, Z, T, Results, SuccessProbs_known)
+}
+
+end_time <- Sys.time()
+
+end_time - start_time
+```
+
+```{r}
+stopCluster(cl)
+```
+
+```{r}
+write.csv2(df, file = paste("./Results/Scenario1_RA_",format(Sys.time(), "%Y%m%d"),".csv", sep = ""))
+```
+
+
+

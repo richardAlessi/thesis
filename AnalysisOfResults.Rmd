@@ -1,0 +1,38 @@
+---
+title: "Analysis of thesis results"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+
+
+```{r}
+df <- read.csv("C:/Users/richa/Desktop/Thesis/Code/thesis/V2_Results/Scenario_1_RA_20220916.csv")
+df <- read.csv("C:/Users/richa/Desktop/Thesis/Code/thesis/V2_Results/Scenario_1_All_full_run_20220923.csv")
+summary(df)
+```
+
+
+```{r}
+df2 = mutate(df, numObs = Allocated_A + Allocated_B)
+df2 = mutate(df2, Model = as.factor(Model))
+out = df2 %>% group_by(Model, numObs) %>% summarise(avg = mean(Successes_total/numObs), var = var(Successes_total), avgA = mean(Allocated_A/numObs), VarA = var(Allocated_A/numObs))
+```
+
+
+```{r}
+ggplot(data = df[df$Sample_size == 1000,], aes(Model, Successes_total), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+

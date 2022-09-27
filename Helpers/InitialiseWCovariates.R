@@ -25,7 +25,7 @@ InitialiseWCovariates <- function(n, n0, T, Results, Z){
       success_Z0 = sum(Res[(All == t) & (Z_sample == 0), t])
       Failure_Z0 = sum(1- Res[(All == t) & (Z_sample == 0), t])
       success_Z1 = sum(Res[(All == t) & (Z_sample == 1), t])
-      Failure_Z0 = sum(1- Res[(All == t) & (Z_sample == 1), t])
+      Failure_Z1 = sum(1- Res[(All == t) & (Z_sample == 1), t])
     }
   }
   return(Allocation)

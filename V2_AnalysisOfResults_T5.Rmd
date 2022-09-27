@@ -1,0 +1,119 @@
+---
+title: "Analysis of thesis results"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tibble)
+```
+
+
+
+```{r}
+df <- read.csv("C:/Users/richa/Desktop/Thesis/Code/thesis/V2_Results/Scenario_1_All_full_run_5T_20220926.csv")
+summary(df)
+```
+
+```{r}
+add_cols <- function(df, cols) {
+  add <- cols[!cols %in% names(df)]
+  if(length(add) != 0) df[add] <- 0
+  return(df)
+}
+```
+
+
+```{r}
+n = dim(df)[1]
+Tr = 5
+Allocation_by_treatment = data.frame(A = as.integer(), B = as.integer(), C = as.integer(), D = as.integer(), E = as.integer())
+  #matrix(0, nrow = n, ncol = Tr)
+
+oldNames = c("1", "2", "3", "4", "5")
+nameList = c("A", "B", "C", "D", "E")
+
+for (i in 1:n) {
+  New_allocation = as.data.frame(t(eval(parse(text = df$Allocation_by_treatment[i]))))
+  if(length(New_allocation != 5)){
+    cols2add = setdiff(oldNames, names(New_allocation))
+    New_allocation = add_cols(New_allocation, cols2add)
+    #New_allocation[is.na(New_allocation)] <- 0
+  }
+  colnames(New_allocation) = nameList
+  Allocation_by_treatment = bind_rows(Allocation_by_treatment, New_allocation)
+}
+
+df2 = bind_cols(df, Allocation_by_treatment)
+df2 = mutate(df2, Perc_A = A/Sample_size)
+```
+
+```{r}
+Z0_Allocation_by_treatment = matrix(0, nrow = n, ncol = Tr)
+Z0_Allocation_by_treatment = data.frame(A = as.integer(), B = as.integer(), C = as.integer(), D = as.integer(), E = as.integer())
+  #matrix(0, nrow = n, ncol = Tr)
+
+oldNames = c("1", "2", "3", "4", "5")
+nameList = c("A", "B", "C", "D", "E")
+
+for (i in 1:n) {
+  Z0_New_allocation = as.data.frame(t(eval(parse(text = df$Z0_Allocation_by_treatment[i]))))
+  if(length(Z0_New_allocation != 5)){
+    cols2add = setdiff(oldNames, names(Z0_New_allocation))
+    Z0_New_allocation = add_cols(Z0_New_allocation, cols2add)
+    #New_allocation[is.na(New_allocation)] <- 0
+  }
+  colnames(Z0_New_allocation) = nameList
+  Z0_Allocation_by_treatment = bind_rows(Z0_Allocation_by_treatment, Z0_New_allocation)
+}
+
+colnames(Z0_Allocation_by_treatment) = c("Z0_Allocated_A", "Z0_Allocated_B")
+df2 = bind_cols(df2, Z0_Allocation_by_treatment)
+df2 = mutate(df2, Z0_Perc_A = Z0_Allocated_A/Sample_size)
+```
+
+```{r}
+ggplot(data = df[df$Sample_size == 1000,], aes(Model, Successes_total), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+```{r}
+ggplot(data = df2[df2$Sample_size == 1000,], aes(Model, Power), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+
+
+```{r}
+ggplot(data = df2[df2$Sample_size == 100,], aes(Model, Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ggsave("C:/Users/richa/Desktop/Thesis/Code/thesis/Images/n100_T5_PercA.pdf", device = "pdf")
+```
+
+```{r}
+ggplot(data = df2[df2$Sample_size == 1000,], aes(Model, Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ggsave("C:/Users/richa/Desktop/Thesis/Code/thesis/Images/n1000_PercA_T5.pdf", device = "pdf")
+```
+
+
+
+
+```{r}
+ggplot(data = df2[df2$Model == "RA_DBCD_RSIHR",], aes(as.factor(Sample_size), Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ggsave("C:/Users/richa/Desktop/Thesis/Code/thesis/Images/RA_DBCD_RSIHR_PercentAllocatedA.pdf", device = "pdf")
+```
+
+
+```{r}
+ggplot(data = df2[df2$Sample_size == 300,], aes(Model, Z0_Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ggsave("C:/Users/richa/Desktop/Thesis/Code/thesis/Images/Z0_PercA_T5_n300.pdf", device = "pdf")
+```
+
+
+
+

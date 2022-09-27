@@ -49,18 +49,8 @@ source("./Models/CARA/23_OptimalAdjusted_CARA.R")
 
 # Set up simulation parameters
 ```{r}
-runs = 10
-n = 1000
-ModelNumber = c()
-Model = c()
-Run = c()
-Successes_total = c()
-Successes_A = c()
-Successes_B = c()
-Allocated_A = c()
-Allocated_B = c()
-Power = c()
-
+runs = 1000
+n_s = c(20,30,40,50,60,70,80,90,100,200)
 n0 = 20
 
 Z = rbinom(n,1,0.5) # Simulate single binary covariate
@@ -72,7 +62,7 @@ SuccessProbs = matrix(data = c(0.3, 0.1, 0.4, 0.8), nrow = 2, ncol = 2)
 
 
 ```{r}
-runSims = function(k) {
+runSims = function(k, n, n0, Z, T, Results, SuccessProbs_known, c_gamma) {
 
 ModelNumber = c()
 Model = c()
@@ -148,8 +138,8 @@ Allocated_A =     append(Allocated_A, sum(Allocation_OptimalAdjusted_estimated =
 Allocated_B =     append(Allocated_B, sum(Allocation_OptimalAdjusted_estimated == 2))
 Run = append(Run, k)
 
-#df = as.array(data.frame(ModelNumber = ModelNumber, Model =  Model, Run = Run, Successes =  Successes_total, Successes_A =Successes_A, Successes_B = Successes_B, Allocated_A = Allocated_A, Allocated_B = Allocated_B))
-df = c(ModelNumber, Model, Run, Successes_total, Successes_A, Successes_B, Allocated_A, Allocated_B)
+df = data.frame(ModelNumber = ModelNumber, Model =  Model, Run = Run, Successes =  Successes_total, Successes_A =Successes_A, Successes_B = Successes_B, Allocated_A = Allocated_A, Allocated_B = Allocated_B)
+#df = c(ModelNumber, Model, Run, Successes_total, Successes_A, Successes_B, Allocated_A, Allocated_B)
 
 return(df)
 
@@ -166,24 +156,21 @@ cl = makeCluster(numCores)
 registerDoParallel(cl)
 ```
 
-```{r}
-r3 = runSims(3)
-r4 = runSims(4)
-
-#res = for(i in 1:runs){rbind(r1,runSims(i))}
-
-```
-
 
 ```{r}
-resultsCombined = foreach(k = 1:4, .combine = 'c', .verbose = TRUE) %dopar% {
-    runSims(k)
+resultsCombined = foreach(k = 1:runs, .combine = rbind, .export = ("T"), .noexport = ("t"), .verbose = FALSE, .multicombine = TRUE) %dopar% {
+  res = c()
+  for (n in n_s) {
+    res = rbind(res, runSims(k, n, n0, Z, T, Results, SuccessProbs_known, c_gamma))
+  }
+  return(res)
 }
 
 ```
 
 ```{r}
 dim(resultsCombined)
+resultsCombined
 ```
 
 

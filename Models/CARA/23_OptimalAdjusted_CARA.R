@@ -26,7 +26,7 @@ OptimalAdjustedCara <- function(n, n0,Z, Results){
       q[j] = 1 - p[j]
     }
     denom = sum(sqrt(p)*q)
-    p_calc = sqrt(p)*q/denom
+    p_calc = sqrt(p)*q/denom 
     Allocation[i] = sample(T,1, replace = TRUE, prob = p_calc)
   }
   

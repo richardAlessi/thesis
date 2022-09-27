@@ -1,0 +1,155 @@
+---
+title: "Scenario1_ResponseAdaptive"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+```{r}
+library(stringr)
+library(foreach)
+library(parallel)
+library(iterators)
+library(doParallel)
+```
+
+
+```{r}
+# Results measures
+source("./ResultMeasures/successCount.R")
+source("./ResultMeasures/successTreatmentCount.R")
+
+# Helper files
+source("./Helpers/Initialise_RR.R")
+source("./Helpers/InitialiseWCovariates_RR.R")
+source("./Helpers/Power.R")
+source("./Helpers/DBCD_G_Multi_Function.R")
+```
+
+# Allocation methods we will use
+
+### Coin based designs
+```{r}
+source("./NewModels/3_MLMethods.R")
+```
+
+# Set up simulation parameters
+```{r}
+runs = 1000
+n_s = c(20, 30,40,50,60,70,80,90,100,200,300,400, 500, 1000)
+n0 = 5
+
+SuccessProbs_known = c(0.3, 0.5)
+
+SuccessProbs = matrix(data = c(0.4, 0.2, 0.3, 0.7), nrow = 2, ncol = 2)
+
+c_gamma = 3
+temp = 5
+eps = 0.1
+
+Model_allocations = c("Random", "PlayTheWinner", "PlayTheWinnerRandomised", "EpsilonGreedy", "SoftMax")
+```
+
+
+```{r}
+
+RunModel <- function(AllocationMethod, n, n0, Results, k, eps =NULL, temp = NULL, p_known){
+  Allocation = ML_Methods(n0, Results, Method = AllocationMethod, eps, temp)
+  TotalSuccesses = successCount(Allocation, Results)
+  TotalTreatmentSuccesses = successTreatmentCount(Allocation, Results)
+  
+  df_update = c(paste("RA", AllocationMethod, sep = "_"),
+                k,
+                n,
+                TotalSuccesses,
+                TotalTreatmentSuccesses[1],
+                TotalTreatmentSuccesses[2],
+                sum(Allocation == 1),
+                sum(Allocation == 2),
+                PowerCalc(p_known, Allocation, alpha = 0.05, alternative = "two.sided")
+                )
+  return(data.frame(t(df_update)))
+}
+
+```
+  
+  
+```{r}
+
+runSims = function(k, n, n0, SuccessProbs, eps, temp) {
+  
+  df = data.frame(
+    Model = character(),
+    Run = integer(),
+    SampleSize = integer(),
+    Successes_total = integer(),
+    Successes_A = integer(),
+    Successes_B = integer(),
+    Allocated_A = integer(),
+    Allocated_B = integer(),
+    Power = double()
+  )
+
+  # Results
+  Tr = length(SuccessProbs)/2
+  Results = matrix(0, nrow = n, ncol = Tr)
+  Z = rbinom(n,1,0.5) # Simulate single binary covariate
+  
+  
+    for (i in 1:Tr) {
+      Results[ , i] = rbinom(n, 1, SuccessProbs[Z+1, i]) 
+    }
+
+SuccessProbs_known = colMeans(SuccessProbs)
+  
+# Run remaining models
+  for (AM in Model_allocations) {
+     df[nrow(df)+1,] = RunModel(AM, n, n0, Results, k, eps, temp, SuccessProbs_known)
+   }
+ return(df)
+}
+
+
+```
+
+
+```{r}
+numCores <- parallel::detectCores() # Requires library(parallel)
+cl = makeCluster(numCores)
+registerDoParallel(cl)
+print(numCores)
+```
+
+
+
+
+```{r}
+start_time <- Sys.time()
+resultsCombined = foreach(k = 1:runs, .combine = rbind) %dopar% {
+  res = c()
+  for (n in n_s) {
+    res = rbind(res, runSims(k, n, n0, SuccessProbs, eps, temp))
+  }
+  return(res)
+}
+
+end_time <- Sys.time()
+
+end_time - start_time
+```
+
+```{r}
+stopCluster(cl)
+```
+
+```{r}
+write.csv(resultsCombined, file = paste("./V2_Results/Scenario_1_ML_",format(Sys.time(), "%Y%m%d"),".csv", sep = ""))
+```
+
+
+
+
+
+```{r}
+ runSims(1, 100, n0, SuccessProbs, eps, temp)
+```
+

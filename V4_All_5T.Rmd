@@ -1,0 +1,263 @@
+---
+title: "V4_AllCombined_T5"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+```{r}
+library(stringr)
+library(foreach)
+library(parallel)
+library(iterators)
+library(doParallel)
+```
+
+
+```{r}
+# Results measures
+source("./ResultMeasures/successCount.R")
+source("./ResultMeasures/successTreatmentCount.R")
+
+# Helper files
+source("./Helpers/Initialise_RR.R")
+source("./Helpers/InitialiseWCovariates_RR.R")
+source("./Helpers/PowerWCovariates.R")
+source("./Helpers/Power.R")
+source("./Helpers/DBCD_G_Multi_Function.R")
+```
+
+# Allocation methods we will use
+```{r}
+source("./NewModels/1_ResponseAdaptive.r")
+source("./NewModels/2_CARA.r")
+source("./NewModels/3_MLMethods.R")
+source("./Models/RA/11_GittinsIndex.R")
+GI = readRDS("C:/Users/richa/Desktop/Thesis/Code/thesis/Helpers/GittinsMatrix.rds")
+```
+
+# Set up simulation parameters
+```{r}
+runs = 1000
+n_s = c(30,40,50,60,70,80,90,100,200,300,400, 500, 1000)
+n0 = 3
+
+SuccessProbs_known = c(0.3, 0.5, 0.8, 0.6, 0.2)
+
+SuccessProbs = matrix(data = c(0.4, 0.2, 0.3, 0.7, 0.7, 0.9, 0.6, 0.6, 0.15, 0.25), nrow = 2, ncol = 5)
+
+params = data.frame(c_gamma = 3,temp = 5,eps = 0.1)
+
+Model_allocations = c("Neyman", "RSIHR", "Rosenberger", "OptimallyAdjusted")
+Model_estimations = c("Known", "Estimated", "DBCD")
+
+ML_Allocations = c("Random", "PlayTheWinner", "PlayTheWinnerRandomised", "EpsilonGreedy", "SoftMax")
+
+```
+
+```{r}
+RunModel_RA <- function(AllocationMethod, EstimationMethod, n, n0, Z, Results, k, p_known, params){
+  c_gamma = params$c_gamma
+  SuccessProbs_known = colMeans(p_known)
+  Allocation = ResponseAdaptive(n, n0, Results, AllocationMethod = AllocationMethod, EstimationMethod = EstimationMethod, p_known =  SuccessProbs_known, gam = c_gamma)
+  TotalSuccesses = successCount(Allocation, Results)
+  TotalTreatmentSuccesses = successTreatmentCount(Allocation, Results)
+  
+  Z0_TotalSuccesses = successCount(Allocation[Z==0], Results[Z==0,])
+  Z0_TotalTreatmentSuccesses = successTreatmentCount(Allocation[Z==0], Results[Z==0,])
+  
+  
+  df_update = c(paste("RA", EstimationMethod, AllocationMethod, sep = "_"),
+                k, n, 
+                TotalSuccesses,
+                as.character(list(TotalTreatmentSuccesses)),
+                as.character(list(table(Allocation))), 
+                Z0_TotalSuccesses,
+                as.character(list(Z0_TotalTreatmentSuccesses)),
+                as.character(list(table(Allocation[Z==0]))),
+                PowerCalc(p_known, Allocation, alpha = 0.05, alternative = "two.sided"),
+                as.character(list(params)),
+                as.character(list(c(p_known)))
+  )
+  return(data.frame(t(df_update)))
+}
+
+RunModel_CARA <- function(AllocationMethod, EstimationMethod, n, n0, Z, Results, k, p_known, params){
+  c_gamma = params$c_gamma
+  Allocation = CARA(Results, n0, Z, AllocationMethod = AllocationMethod, EstimationMethod = EstimationMethod, p_known =  p_known, gam = c_gamma)
+  TotalSuccesses = successCount(Allocation, Results)
+  TotalTreatmentSuccesses = successTreatmentCount(Allocation, Results)
+  
+  Z0_TotalSuccesses = successCount(Allocation[Z==0], Results[Z==0,])
+  Z0_TotalTreatmentSuccesses = successTreatmentCount(Allocation[Z==0], Results[Z==0,])
+  
+  df_update = c(paste("CARA", EstimationMethod, AllocationMethod, sep = "_"),
+                k, n, 
+                TotalSuccesses,
+                as.character(list(TotalTreatmentSuccesses)),
+                as.character(list(table(Allocation))), 
+                Z0_TotalSuccesses,
+                as.character(list(Z0_TotalTreatmentSuccesses)),
+                as.character(list(table(Allocation[Z==0]))),
+                PowerWCovariates(p_known, Allocation, alpha = 0.05, Z),
+                as.character(list(params)),
+                as.character(list(c(p_known)))
+                )
+  return(data.frame(t(df_update)))
+}
+
+
+RunModel_ML <- function(AllocationMethod, n, n0, Z, Results, k, p_known, params){
+  temp = params$temp
+  eps = params$eps
+  Allocation = ML_Methods(n0, Results, Method = AllocationMethod, eps, temp)
+  TotalSuccesses = successCount(Allocation, Results)
+  TotalTreatmentSuccesses = successTreatmentCount(Allocation, Results)
+  
+  Z0_TotalSuccesses = successCount(Allocation[Z==0], Results[Z==0,])
+  Z0_TotalTreatmentSuccesses = successTreatmentCount(Allocation[Z==0], Results[Z==0,])
+  
+  df_update = c(paste("ML", AllocationMethod, sep = "_"),
+                k, n, 
+                TotalSuccesses,
+                as.character(list(TotalTreatmentSuccesses)),
+                as.character(list(table(Allocation))), 
+                Z0_TotalSuccesses,
+                as.character(list(Z0_TotalTreatmentSuccesses)),
+                as.character(list(table(Allocation[Z==0]))),
+                PowerCalc(p_known, Allocation, alpha = 0.05, alternative = "two.sided"),
+                as.character(list(params)),
+                as.character(list(c(p_known)))
+  )
+  return(data.frame(t(df_update)))
+}
+
+RunModel_Gittins <- function(n0, Z, Results, k, p_known, Random, GI){
+  Allocation = GittinsIndex(n0, Results, GI, Random)
+  TotalSuccesses = successCount(Allocation, Results)
+  TotalTreatmentSuccesses = successTreatmentCount(Allocation, Results)
+  
+  Z0_TotalSuccesses = successCount(Allocation[Z==0], Results[Z==0,])
+  Z0_TotalTreatmentSuccesses = successTreatmentCount(Allocation[Z==0], Results[Z==0,])
+  
+  df_update = c(paste("Gittins", ifelse(Random, "Random", "Normal"), sep = "_"),
+                k, n, 
+                TotalSuccesses,
+                as.character(list(TotalTreatmentSuccesses)),
+                as.character(list(table(Allocation))), 
+                Z0_TotalSuccesses,
+                as.character(list(Z0_TotalTreatmentSuccesses)),
+                as.character(list(table(Allocation[Z==0]))),
+                PowerCalc(p_known, Allocation, alpha = 0.05, alternative = "two.sided"),
+                as.character(list(params)),
+                as.character(list(c(p_known)))
+  )
+  return(data.frame(t(df_update)))
+}
+
+```
+
+
+
+```{r}
+
+runSims = function(k, n, n0, SuccessProbs, params, GI) {
+  
+  df = data.frame(
+    Model = character(),
+    Run = integer(),
+    Sample_size = integer(),
+    Successes_total = integer(),
+    Success_by_treatment = character(),
+    Allocation_by_treatment = character(),
+    Z0_Successes_total = integer(),
+    Z0_Success_by_treatment = character(),
+    Z0_Allocation_by_treatment = character(),
+    Power = double(),
+    Parameters = character(),
+    Success_Probabilities = character()
+  )
+
+  # Results
+  Tr = dim(SuccessProbs)[2]
+  Results = matrix(0, nrow = n, ncol = Tr)
+  Z = rbinom(n,1,0.5) # Simulate single binary covariate
+
+  for (i in 1:Tr) {
+    Results[ , i] = rbinom(n, 1, SuccessProbs[Z+1, i]) 
+  }
+  
+  SuccessProbs_known = colMeans(SuccessProbs)
+
+
+# Run models
+  for (AM in Model_allocations) {
+    for (EM in Model_estimations) {
+      df[nrow(df)+1,] = RunModel_RA(AllocationMethod = AM, EstimationMethod = EM, n, n0, Z, Results, k, p_known = SuccessProbs, params)
+      df[nrow(df)+1,] = RunModel_CARA(AllocationMethod = AM, EstimationMethod = EM, n, n0, Z, Results, k, p_known = SuccessProbs, params)
+    }
+    
+  }
+  
+  
+# Run remaining models
+  for (M in ML_Allocations) {
+     df[nrow(df)+1,] = RunModel_ML(M, n, n0, Z, Results, k, SuccessProbs_known, params)
+  }
+  
+# Run gittins
+  df[nrow(df)+1,] = RunModel_Gittins(n0, Z, Results, k, SuccessProbs, TRUE, GI)
+  df[nrow(df)+1,] = RunModel_Gittins(n0, Z, Results, k, SuccessProbs, FALSE, GI)
+  
+ return(df)
+}
+
+
+```
+
+
+```{r}
+numCores <- parallel::detectCores() - 2 # Requires library(parallel)
+cl = makeCluster(numCores)
+registerDoParallel(cl)
+print(numCores)
+```
+
+
+
+
+```{r}
+start_time <- Sys.time()
+resultsCombined = foreach(k = 1:runs, .combine = rbind) %dopar% {
+  res = c()
+  for (n in n_s) {
+    res = rbind(res, runSims(k, n, n0, SuccessProbs, params, GI))
+  }
+  return(res)
+}
+
+end_time <- Sys.time()
+
+end_time - start_time
+```
+
+```{r}
+stopCluster(cl)
+```
+
+```{r}
+write.csv(resultsCombined, file = paste("./V2_Results/Scenario_1_All_full_run_5T_",format(Sys.time(), "%Y%m%d"),".csv", sep = ""))
+```
+
+
+
+To extract information from the nested lists
+eval(parse(text = df$Success_Probabilities[1]))[1]
+
+
+```{r}
+RunModel_CARA(AllocationMethod = Model_allocations[2], EstimationMethod = Model_estimations[2], n, n0, Z, Results, k, p_known = SuccessProbs, params)
+```
+```{r}
+runSims(k, 300, n0, SuccessProbs, params, GI)
+```
+
