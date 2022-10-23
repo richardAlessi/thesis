@@ -1,0 +1,89 @@
+---
+title: "V4_AllCombined"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+```{r}
+library(stringr)
+library(foreach)
+library(parallel)
+library(iterators)
+library(doParallel)
+library(fastDummies)
+library(lmtest)
+library(zoo)
+```
+
+
+```{r}
+# Helper files
+source("./Helpers/successCount.R")
+source("./Helpers/successTreatmentCount.R")
+source("./Helpers/Initialise_RR.R")
+source("./Helpers/InitialiseWCovariates_RR.R")
+source("./Helpers/ChiSq_calc.R")
+source("./Helpers/LR_test_calc.R")
+source("./Helpers/DBCD_G_Multi_Function.R")
+```
+
+# Allocation methods we will use
+```{r}
+source("./Models/1_ResponseAdaptive.r")
+source("./Models/2_CARA.r")
+source("./Models/3_MLMethods.R")
+source("./Models/4_GittinsIndex.R")
+GI = readRDS("C:/Users/richa/Desktop/Thesis/Code/thesis/FinalModel/Helpers/GittinsMatrix.rds")
+
+source("./RunModelFunctions.R")
+```
+
+# Set up global simulation parameters
+```{r}
+runSize = 100 # How often we save results to file
+runRepeats = 3 # Number of times we repeat runSize
+n_max = 1000 # Total sample size calculated
+n_min = 10
+n_step = 10
+n0 = 3 
+
+
+SuccessProbs_List = matrix(data = c(
+  0.4, 0.8, 0.3, 0.1,
+  0.4, 0.6, 0.35, 0.25,
+  0.45, 0.35, 0.3,0.5,
+  0.5, 0.5, 0.3, 0.3, 
+  0.4, 0.4, 0.4, 0.4), nrow = 5, ncol = 4, byrow = TRUE)
+
+params = data.frame(c_gamma = 3,temp = 5,eps = 0.1)
+```
+
+
+```{r}
+numCores <- parallel::detectCores() # Requires library(parallel)
+cl = makeCluster(numCores)
+registerDoParallel(cl)
+print(numCores)
+```
+
+```{r}
+for (h in dim(SuccessProbs_List)[1]) {
+  SuccessProbs = matrix(SuccessProbs_List[h,], nrow = 2, ncol = 2, byrow = FALSE)
+  for(g in 1:runRepeats){
+    start_time <- Sys.time()
+    resultsCombined = foreach(k = 1:runSize, .combine = rbind) %dopar% {
+      res = runSims(k,  n_max, n_min, n_step, n0, SuccessProbs, params, GI)
+      return(res)
+    }
+
+    end_time <- Sys.time()
+    write.csv(resultsCombined, file = paste("C:/Users/richa/Desktop/Thesis/FinalResults/Scenario",h ,"_T2_Run",g,"_",format(Sys.time(), "%Y%m%d"),".csv", sep = ""))
+    print(end_time - start_time) 
+  }
+}
+```
+
+
+```{r}
+stopCluster(cl)
+```

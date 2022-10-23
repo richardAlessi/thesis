@@ -80,9 +80,25 @@ df2 = bind_cols(df2, Z0_Allocation_by_treatment)
 df2 = mutate(df2, Z0_Perc_A = Z0_Allocated_A/Sample_size)
 ```
 
+
+# Chart 16 - Violins of all models - success totals n =1000, t = 5
+
 ```{r}
-ggplot(data = df[df$Sample_size == 1000,], aes(Model, Successes_total), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ggplot(data = df[df$Sample_size == 1000,], aes(Model, Successes_total/Sample_size), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart16_violins_successes_n1000_t5.pdf", device = "pdf", width = 15, units = "cm")
 ```
+
+# Chart 15 - Violins of all models - success totals n =100, t = 5
+
+```{r}
+ggplot(data = df[df$Sample_size == 100,], aes(Model, Successes_total/Sample_size), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart15_violins_successes_n100_t5.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
+
 ```{r}
 ggplot(data = df2[df2$Sample_size == 1000,], aes(Model, Power), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
@@ -101,17 +117,18 @@ ggsave("C:/Users/richa/Desktop/Thesis/Code/thesis/Images/n1000_PercA_T5.pdf", de
 ```
 
 
-
+# Chart 1a: Distribution of percent of allocation A by sample size
 
 ```{r}
 ggplot(data = df2[df2$Model == "RA_DBCD_RSIHR",], aes(as.factor(Sample_size), Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ggsave("C:/Users/richa/Desktop/Thesis/Code/thesis/Images/RA_DBCD_RSIHR_PercentAllocatedA.pdf", device = "pdf")
 ```
+# Chart 
 
 
 ```{r}
-ggplot(data = df2[df2$Sample_size == 300,], aes(Model, Z0_Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-ggsave("C:/Users/richa/Desktop/Thesis/Code/thesis/Images/Z0_PercA_T5_n300.pdf", device = "pdf")
+ggplot(data = df2[df2$Sample_size == 500,], aes(Model, Z0_Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ggsave("C:/Users/richa/Desktop/Thesis/Code/thesis/Images/Z0_PercA_T5_n500.pdf", device = "pdf", width = 15, uinits = "cm")
 ```
 
 

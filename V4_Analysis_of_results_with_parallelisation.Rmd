@@ -1,0 +1,217 @@
+---
+title: "Analysis of thesis results"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tibble)
+
+library(foreach)
+library(parallel)
+library(iterators)
+library(doParallel)
+```
+
+
+```{r}
+df_T5 <- read.csv("C:/Users/richa/Desktop/Thesis/V2_Results/Scenario_1_All_full_run_n500_20221015.csv")
+summary(df_T5)
+```
+
+
+```{r}
+df_T2 <- read.csv("C:/Users/richa/Desktop/Thesis/V3_Results/Scenario_5_Full_T2_20221022.csv")
+summary(df_T2)
+```
+
+
+```{r}
+AllocationByTreatment = readRDS("C:/Users/richa/Desktop/Thesis/V2_Results/AllocationByTreatment221007")
+head(AllocationByTreatment)
+```
+
+```{r}
+head(df_T2)
+```
+
+```{r}
+add_cols <- function(df, cols) {
+  add <- cols[!cols %in% names(df)]
+  if(length(add) != 0) df[add] <- 0
+  return(df)
+}
+```
+
+
+## Using Old logic/version
+```{r}
+df2_T2 = bind_cols(df_T2, AllocationByTreatment[c("A", "B")])
+df2_T2 = mutate(df2_T2, Perc_A = A/Sample_size)
+```
+
+
+# Parse the allocations
+Start with t = 5 and regulat allocation
+```{r}
+n = dim(df_T5)[1]
+
+Alloc = data.frame(A = as.integer(), B = as.integer(), C = as.integer(), D = as.integer(), E = as.integer())
+oldNames = c("1", "2", "3", "4", "5")
+colnames(Alloc) = oldNames
+
+Alloc
+```
+
+
+
+
+```{r}
+start_time <- Sys.time()
+for(i in 1:n){
+  New_allocation = as.data.frame(t(eval(parse(text = df_T5$Allocation_by_treatment[i]))))
+  Alloc = dplyr::bind_rows(Alloc, New_allocation)
+}
+
+end_time <- Sys.time()
+
+end_time - start_time
+```
+
+
+```{r}
+colnames(Alloc ) = c("A", "B", "C", "D", "E")
+head(Alloc)
+```
+
+
+```{r}
+Alloc[is.na(Alloc)] <- 0
+Alloc_check = rep(0,n)
+for(i in 1:n){
+Alloc_check[i] = ifelse(sum(Alloc[i,1:5]) == df_T5$Sample_size[i],1,0)
+}
+
+df2_T5 = bind_cols(df_T5[1:n,], Alloc[,1:5], Alloc_check)
+df2_T5 = mutate(df2_T5, Perc_A = A/Sample_size)
+```
+
+
+## Parse the Z0 allocations
+```{r}
+Z0_Alloc = data.frame(A = as.integer(), B = as.integer(), C = as.integer(), D = as.integer(), E = as.integer())
+
+oldNames = c("1", "2", "3", "4", "5")
+colnames(Z0_Alloc) = oldNames
+
+
+start_time <- Sys.time()
+for(i in 1:n){
+  Z0_New_allocation = as.data.frame(t(eval(parse(text = df2_T5$Z0_Allocation_by_treatment[i]))))
+  Z0_Alloc = dplyr::bind_rows(Z0_Alloc, Z0_New_allocation)
+}
+
+end_time <- Sys.time()
+
+end_time - start_time
+```
+
+
+```{r}
+Z0_Alloc[is.na(Z0_Alloc)] <- 0
+colnames(Z0_Alloc ) = c("Z0_A", "Z0_B", "Z0_C", "Z0_D", "Z0_E")
+
+df2_T5 = bind_cols(df2_T5[1:n,], Z0_Alloc[,1:5])
+df2_T5 = mutate(df2_T5, Z0_Perc_A = Z0_A/Sample_size)
+
+saveRDS(df2_T5, file = "C:/Users/richa/Desktop/Thesis/V2_Results/df2_T5.RDS")
+```
+
+
+# Parse the T=2 Allocations
+repeat for T = 2
+```{r}
+n = dim(df_T2)[1]
+
+Alloc = data.frame(A = as.integer(), B = as.integer())
+oldNames = c("1", "2")
+colnames(Alloc) = oldNames
+Alloc
+```
+
+
+
+
+```{r}
+start_time <- Sys.time()
+for(i in 1:n){
+  New_allocation = as.data.frame(t(eval(parse(text = df_T2$Allocation_by_treatment[i]))))
+  Alloc = dplyr::bind_rows(Alloc, New_allocation)
+}
+
+end_time <- Sys.time()
+
+end_time - start_time
+```
+
+
+```{r}
+colnames(Alloc ) = c("A", "B")
+head(Alloc)
+```
+
+
+```{r}
+n = dim(Alloc)[1]
+Alloc[is.na(Alloc)] <- 0
+Alloc_check = rep(0,n)
+for(i in 1:n){
+Alloc_check[i] = ifelse(sum(Alloc[i,1:2]) == df_T2$Sample_size[i],1,0)
+}
+
+df2_T2 = bind_cols(df_T2[1:n,], Alloc[,1:2], Alloc_check)
+df2_T2 = mutate(df2_T2, Perc_A = A/Sample_size)
+```
+
+
+## Parse the Z0 allocations
+```{r}
+Z0_Alloc = data.frame(A = as.integer(), B = as.integer())
+
+oldNames = c("1", "2")
+colnames(Z0_Alloc) = oldNames
+
+
+start_time <- Sys.time()
+for(i in 1:n){
+  Z0_New_allocation = as.data.frame(t(eval(parse(text = df2_T2$Z0_Allocation_by_treatment[i]))))
+  Z0_Alloc = dplyr::bind_rows(Z0_Alloc, Z0_New_allocation)
+}
+
+end_time <- Sys.time()
+
+end_time - start_time
+```
+
+
+```{r}
+colnames(Z0_Alloc ) = c("Z0_A", "Z0_B")
+
+df2_T2 = bind_cols(df2_T2[1:n,], Z0_Alloc[,1:2])
+df2_T2 = mutate(df2_T2, Z0_Perc_A = Z0_A/Sample_size)
+
+saveRDS(df2_T2, file = "C:/Users/richa/Desktop/Thesis/V3_Results/df2_T2_scenario5.RDS")
+```
+
+
+
+
+

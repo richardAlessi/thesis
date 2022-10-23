@@ -1,0 +1,323 @@
+---
+title: "Analysis of thesis results"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tibble)
+```
+
+
+
+```{r}
+df_T5 <- read.csv("C:/Users/richa/Desktop/Thesis/V2_Results/Scenario_1_All_full_run_5T_20220926.csv")
+summary(df_T5)
+```
+
+
+```{r}
+df_T2 <- read.csv("C:/Users/richa/Desktop/Thesis/V2_Results/Scenario_1_All_full_run_20220923.csv")
+summary(df_T2)
+```
+
+```{r}
+add_cols <- function(df, cols) {
+  add <- cols[!cols %in% names(df)]
+  if(length(add) != 0) df[add] <- 0
+  return(df)
+}
+```
+
+
+```{r}
+n = dim(df_T5)[1]
+Tr = 5
+Allocation_by_treatment = data.frame(A = as.integer(), B = as.integer(), C = as.integer(), D = as.integer(), E = as.integer())
+  #matrix(0, nrow = n, ncol = Tr)
+
+oldNames = c("1", "2", "3", "4", "5")
+nameList = c("A", "B", "C", "D", "E")
+
+for (i in 1:n) {
+  New_allocation = as.data.frame(t(eval(parse(text = df_T5$Allocation_by_treatment[i]))))
+  if(length(New_allocation != 5)){
+    cols2add = setdiff(oldNames, names(New_allocation))
+    New_allocation = add_cols(New_allocation, cols2add)
+    #New_allocation[is.na(New_allocation)] <- 0
+  }
+  colnames(New_allocation) = nameList
+  Allocation_by_treatment = bind_rows(Allocation_by_treatment, New_allocation)
+}
+
+df2_T5 = bind_cols(df_T5, Allocation_by_treatment)
+df2_T5 = mutate(df2_T5, Perc_A = A/Sample_size)
+```
+
+```{r}
+Z0_Allocation_by_treatment = matrix(0, nrow = n, ncol = Tr)
+Z0_Allocation_by_treatment = data.frame(A = as.integer(), B = as.integer(), C = as.integer(), D = as.integer(), E = as.integer())
+  #matrix(0, nrow = n, ncol = Tr)
+
+oldNames = c("1", "2", "3", "4", "5")
+nameList = c("A", "B", "C", "D", "E")
+
+for (i in 1:n) {
+  Z0_New_allocation = as.data.frame(t(eval(parse(text = df2_T5$Z0_Allocation_by_treatment[i]))))
+  if(length(Z0_New_allocation != 5)){
+    cols2add = setdiff(oldNames, names(Z0_New_allocation))
+    Z0_New_allocation = add_cols(Z0_New_allocation, cols2add)
+    #New_allocation[is.na(New_allocation)] <- 0
+  }
+  colnames(Z0_New_allocation) = nameList
+  Z0_Allocation_by_treatment = bind_rows(Z0_Allocation_by_treatment, Z0_New_allocation)
+}
+
+colnames(Z0_Allocation_by_treatment) = c("Z0_Allocated_A", "Z0_Allocated_B")
+df2_T5 = bind_cols(df2_T5, Z0_Allocation_by_treatment)
+df2_T5 = mutate(df2_T5, Z0_Perc_A = Z0_Allocated_A/Sample_size)
+```
+
+
+```{r}
+n = dim(df_T2)[1]
+Tr = 2
+Allocation_by_treatment = data.frame(A = as.integer(), B = as.integer(), C = as.integer(), D = as.integer(), E = as.integer())
+  #matrix(0, nrow = n, ncol = Tr)
+
+oldNames = c("1", "2")
+nameList = c("A", "B")
+
+for (i in 1:n) {
+  New_allocation = as.data.frame(t(eval(parse(text = df_T2$Allocation_by_treatment[i]))))
+  if(length(New_allocation != 5)){
+    cols2add = setdiff(oldNames, names(New_allocation))
+    New_allocation = add_cols(New_allocation, cols2add)
+    #New_allocation[is.na(New_allocation)] <- 0
+  }
+  colnames(New_allocation) = nameList
+  Allocation_by_treatment = bind_rows(Allocation_by_treatment, New_allocation)
+}
+
+df2_T2 = bind_cols(df_T2, Allocation_by_treatment)
+df2_T2 = mutate(df2_T2, Perc_A = A/Sample_size)
+```
+
+```{r}
+Z0_Allocation_by_treatment = matrix(0, nrow = n, ncol = Tr)
+Z0_Allocation_by_treatment = data.frame(A = as.integer(), B = as.integer(), C = as.integer(), D = as.integer(), E = as.integer())
+  #matrix(0, nrow = n, ncol = Tr)
+
+oldNames = c("1", "2")
+nameList = c("A", "B")
+
+for (i in 1:n) {
+  Z0_New_allocation = as.data.frame(t(eval(parse(text = df2_T2$Z0_Allocation_by_treatment[i]))))
+  if(length(Z0_New_allocation != 5)){
+    cols2add = setdiff(oldNames, names(Z0_New_allocation))
+    Z0_New_allocation = add_cols(Z0_New_allocation, cols2add)
+    #New_allocation[is.na(New_allocation)] <- 0
+  }
+  colnames(Z0_New_allocation) = nameList
+  Z0_Allocation_by_treatment = bind_rows(Z0_Allocation_by_treatment, Z0_New_allocation)
+}
+
+colnames(Z0_Allocation_by_treatment) = c("Z0_Allocated_A", "Z0_Allocated_B")
+df2_T2 = bind_cols(df2_T2, Z0_Allocation_by_treatment)
+df2_T2 = mutate(df2_T2, Z0_Perc_A = Z0_Allocated_A/Sample_size)
+```
+
+
+
+
+
+# Chart 1: Distribution of percent of allocation A by sample size - T = 2 
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_DBCD_RSIHR",], aes(as.factor(Sample_size), Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart1a_violins_percA_by_sample_size_RA_DBCD_RSIHR_t2.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
+
+# Chart 1a: Distribution of percent of allocation A by sample size - T = 5
+
+```{r}
+ggplot(data = df2_T5[df2_T5$Model == "RA_DBCD_RSIHR",], aes(as.factor(Sample_size), Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart1a_violins_percA_by_sample_size_RA_DBCD_RSIHR_t5.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
+# Chart 2 - Percent allocated to A, all model violins, t = 2, n = 100
+
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Sample_size == 100,], aes(Model, Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart2_violins_percA_n100_t2.pdf", device = "pdf", width = 15, units = "cm")
+```
+# Chart 3 - Percent allocated to A, all model violins, t = 2, n = 1000
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Sample_size == 1000,], aes(Model, Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart3_violins_percA_n1000_t2.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+# Chart 4 - Percent allocated to A, all model violins, t = 5, n = 100
+
+
+```{r}
+ggplot(data = df2_T5[df2_T5$Sample_size == 100,], aes(Model, Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart4_violins_percA_n100_t5.pdf", device = "pdf", width = 15, units = "cm")
+```
+# Chart 5 - Percent allocated to A, all model violins, t = 5, n = 1000
+
+```{r}
+ggplot(data = df2_T5[df2_T5$Sample_size == 1000,], aes(Model, Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart5_violins_percA_n1000_t5.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
+# Chart 6 - Tables of key values
+```{r}
+n_s = set(df2_T2$Sample_Size)
+models = set(df2_T2$Model)
+df_summary_T2 = data.frame(Sample_size = integer(), Model = character() , averageSuccessProportion = numeric(), varianceSuccessProportion = numeric(), averageAllocatedA = numeric(), varianceAllocatedA = numeric(), averagePower= numeric() )
+
+df_summary_T2 <- df2_T2 %>% group_by(Model, Sample_Size) %>% summarise(averageSuccessProportion = mean(Successes_total/Sample_size), varSuccessProportion = var(Successes_total/Sample_size), averageAllocatedA = mean(Per_A/Sample_size), VarAllocatedA = Var(Per_A/Sample_size), averagePower = mean(Power), varPower = var(Power))
+
+df_summary_T2
+```
+
+```{r}
+n_s = set(df2_T5$Sample_Size)
+models = set(df2_T5$Model)
+df_summary_T5 = data.frame(Sample_size = integer(), Model = character() , averageSuccessProportion = numeric(), varianceSuccessProportion = numeric(), averageAllocatedA = numeric(), varianceAllocatedA = numeric(), averagePower= numeric() )
+
+df_summary_T5 <- df2_T5 %>% group_by(Model, Sample_Size) %>% summarise(averageSuccessProportion = mean(Successes_total/Sample_size), varSuccessProportion = var(Successes_total/Sample_size), averageAllocatedA = mean(Per_A/Sample_size), VarAllocatedA = Var(Per_A/Sample_size), averagePower = mean(Power), varPower = var(Power))
+
+df_summary_T5
+```
+
+
+
+# Chart 7 - Change in variance of total successes proportion with sample size - T = 2
+```{r}
+ggplot(data = df_summary_T2, aes(Sample_size, Successes_total/Sample_size, color = Model)) +geom_line()+xlab("Sample size") + ylab("Total success proprtion average")+ scale_y_continuous(labels = scales::percent)
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart7_line_avgSuccessProp_t2.pdf", device = "pdf", width = 7, units = "cm")
+```
+
+
+
+# Chart 8 - Change in variance of total successes proportion with sample size - T = 5
+```{r}
+ggplot(data = df_summary_T5, aes(Sample_size, Successes_total/Sample_size, color = Model)) +geom_line()+xlab("Sample size") + ylab("Total success proprtion average")+ scale_y_continuous(labels = scales::percent)
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart7_line_avgSuccessProp_t2.pdf", device = "pdf", width = 7, units = "cm")
+
+```
+
+
+# Chart 9 - Comparison of RA and CARA for Neyman - T = 2, n = 100
+```{r}
+NeymanModels = c("RA_Known_Neyman", "CARA_Known_Neyman", "RA_Estimated_Neyman", "CARA_Estimated_Neyman", "RA_DBCD_Neyman", "CARA_DBCD_Neyman")
+ggplot(data = df2_T5[df2_T5$Sample_size == 100 && (df2_T5$Model %in% NeymanModels)], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart9_violins_SuccessNeymanComparison_n100_t2.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+# Chart 10 - Comparison of RA and CARA for RSIHR - T = 2, n = 100
+```{r}
+RSIHRModels = c("RA_Known_RSIHR", "CARA_Known_RSIHR", "RA_Estimated_RSIHR", "CARA_Estimated_RSIHR", "RA_DBCD_RSIHR", "CARA_DBCD_RSIHR")
+ggplot(data = df2_T5[df2_T5$Sample_size == 100 && (df2_T5$Model %in% RSIHRModels)], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart10_violins_SuccessRSIHRComparison_n100_t2.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
+# Chart 11 - Comparison of RA and CARA for Rosenberger - T = 2, n = 100
+```{r}
+RosenbergerModels = c("RA_Known_Rosenberger", "CARA_Known_Rosenberger", "RA_Estimated_Rosenberger", "CARA_Estimated_Rosenberger", "RA_DBCD_Rosenberger", "CARA_DBCD_Rosenberger")
+ggplot(data = df2_T5[df2_T5$Sample_size == 100 && (df2_T5$Model %in% RosenbergerModels)], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart11_violins_SuccessRosenbergerComparison_n100_t2.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
+# Chart 12 - Comparison of RA and CARA for Optimally Adjusted - T = 2, n = 100
+```{r}
+OptimallyAdjustedModels = c("RA_Known_OptimallyAdjusted", "CARA_Known_OptimallyAdjusted", "RA_Estimated_OptimallyAdjusted", "CARA_Estimated_OptimallyAdjusted", "RA_DBCD_OptimallyAdjusted", "CARA_DBCD_OptimallyAdjusted")
+ggplot(data = df2_T5[df2_T5$Sample_size == 100 && (df2_T5$Model %in% OptimallyAdjustedModels)], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart12_violins_SuccessOptimallyAdjustedComparison_n100_t2.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
+
+# Chart 13 - Violins of all models - success totals n =100, t = 2
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Sample_size == 100,], aes(Model, Successes_total/Sample_size), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proprtion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart13_violins_successes_n100_t2.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
+# Chart 14 - Violins of all models - success totals n =1000, t = 2
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Sample_size == 1000,], aes(Model, Successes_total/Sample_size), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proprtion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart14_violins_successes_n1000_t2.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
+# Chart 15 - Violins of all models - success totals n =100, t = 5
+
+```{r}
+ggplot(data = df2_T5[df2_T5$Sample_size == 100,], aes(Model, Successes_total/Sample_size), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proprtion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart15_violins_successes_n100_t5.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
+# Chart 16 - Violins of all models - success totals n =1000, t = 5
+
+```{r}
+ggplot(data = df2_T5[df2_T5$Sample_size == 1000,], aes(Model, Successes_total/Sample_size), width = 2000) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proprtion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart16_violins_successes_n1000_t5.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
+
+# Chart 17 - Stack bars of treatment allocations, t = 5, n = 100
+
+```{r}
+df2_T5_Perc_A = df2_T5 %>% select(Model, Sample_size, Perc_A)
+df_flat_T5 <- df2_T5_Perc_A %>% melt(id = c(Model, Sample_size)) 
+ggplot(data = df_flat_T5[df_flat_T5$Sample_size == 100,], aes(x = Model, y = value, fill = variable), width = 2000) +  geom_bar(position="stack", stat="identity") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Allocation breakdown")+ scale_y_continuous(labels = scales::percent)
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart17_stacks_PercA_n100_t5.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
+# Chart 18 - Stack bars of treatment allocations, t = 5, n = 1000
+
+```{r}
+df2_T5_Perc_A = df2_T5 %>% select(Model, Sample_size, Perc_A)
+df_flat_T5 <- df2_T5_Perc_A %>% melt(id = c(Model, Sample_size)) 
+ggplot(data = df_flat_T5[df_flat_T5$Sample_size == 1000,], aes(x = Model, y = value, fill = variable), width = 2000) +  geom_bar(position="stack", stat="identity") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Allocation breakdown")+ scale_y_continuous(labels = scales::percent)
+
+ggsave("C:/Users/richa/Desktop/Thesis/Images/Chart18_stacks_PercA_n1000_t5.pdf", device = "pdf", width = 15, units = "cm")
+```
+
+
