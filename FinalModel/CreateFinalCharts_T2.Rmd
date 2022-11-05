@@ -1,0 +1,561 @@
+---
+title: "V4_Creation of charts"
+author: "Richard Alessi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tibble)
+library(xtable)
+
+library(tidyverse)
+library(data.table)
+```
+
+
+
+## Read in values
+```{r}
+setwd("C:/Users/richa/Desktop/Thesis/Results")
+scenarioNumber = "1"
+files_T2 = list.files(pattern = paste("Scenario", scenarioNumber,".*T2.*csv", sep = ""))
+
+start_time =  Sys.time()
+df_T2 = do.call(rbind, lapply(files_T2, fread))
+end_time =  Sys.time()
+print(end_time - start_time)
+```
+
+```{r}
+df2_T2 = df_T2
+df2_T2$Perc_A = df2_T2$Allocation_TreatmentA/df2_T2$Sample_size 
+df2_T2$Power = 1*(df2_T2$ChiSq_pvalue<=0.05)
+```
+
+```{r}
+# Models
+NeymanModels = c("RA_Known_Neyman", "CARA_Known_Neyman", "RA_Estimated_Neyman", "CARA_Estimated_Neyman", "RA_DBCD_Neyman", "CARA_DBCD_Neyman")
+RSIHRModels = c("RA_Known_RSIHR", "CARA_Known_RSIHR", "RA_Estimated_RSIHR", "CARA_Estimated_RSIHR", "RA_DBCD_RSIHR", "CARA_DBCD_RSIHR")
+RosenbergerModels = c("RA_Known_Rosenberger", "CARA_Known_Rosenberger", "RA_Estimated_Rosenberger", "CARA_Estimated_Rosenberger", "RA_DBCD_Rosenberger", "CARA_DBCD_Rosenberger")
+OAModels = c("RA_Known_OptimallyAdjusted", "CARA_Known_OptimallyAdjusted", "RA_Estimated_OptimallyAdjusted", "CARA_Estimated_OptimallyAdjusted", "RA_DBCD_OptimallyAdjusted", "CARA_DBCD_OptimallyAdjusted")
+GittinsModels = c("RA_Gittins_FALSE","RA_Gittins_TRUE")
+MLModels = c("RA_ML Model_Random", "RA_ML Model_PlayTheWinner", "RA_ML Model_PlayTheWinnerRandomised", "RA_ML Model_EpsilonGreedy", "RA_ML Model_SoftMax")
+```
+
+
+
+
+# Table 1 - Tables of key values
+```{r}
+n_s = unique(df2_T2$Sample_Size)
+models = unique(df2_T2$Model)
+
+df_summary_T2 <- df2_T2 %>% group_by(Model, Sample_size) %>% summarise(averageSuccessProportion = mean(Successes_total/Sample_size), varSuccessProportion = var(Successes_total/Sample_size), averageAllocatedA = mean(Perc_A), VarAllocatedA = var(Perc_A), averagePower = mean(Power), varPower = var(Power), Z0_avg_all_A = mean(Z0_Allocation_TreatmentA/Sample_size), Z0_avg_successes_A = mean(Z0_Successes_TreatmentA/Sample_size), Z0_avg_successes_B = mean(Z0_Successes_TreatmentB/Sample_size), ChiSq_005 = mean(ifelse(is.na(ChiSq_pvalue),1,ChiSq_pvalue) <= 0.05), ChiSq_001 = mean(ifelse(is.na(ChiSq_pvalue),1,ChiSq_pvalue) <= 0.01), LR_test_005 = mean(ifelse(is.na(LR_test_pvalue),1,LR_test_pvalue) <= 0.05), LR_test_001 = mean(ifelse(is.na(LR_test_pvalue),1,LR_test_pvalue) <= 0.01))
+
+df2_export_1 = df_summary_T2[df_summary_T2$Sample_size %in% c(100,1000),]
+df2_export_2 = df_summary_T2[df_summary_T2$Sample_size <= 100,]
+```
+
+```{r}
+print(xtable(df2_export_1, type = "latex"), file = paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Table_1_n100_1000_summary_Scenario",scenarioNumber,".tex", sep = ""))
+```
+
+
+# Chart 1.1 - Percent allocated to A, all model violins, t = 2, n = 100, 1000
+```{r}
+ggplot(data = df2_T2[df2_T2$Sample_size == 100,], aes(Model, Perc_A), width = 500) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart1_1_a_violins_percA_n100_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 50, units = "cm")
+```
+
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Sample_size == 1000,], aes(Model, Perc_A), width = 500) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart1_1_b_violins_percA_n1000_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 50, units = "cm")
+```
+
+
+# Chart 1.2 - Total successes, all model violins, t = 2, n = 100, 1000
+```{r}
+ggplot(data = df2_T2[df2_T2$Sample_size == 100,], aes(Model, Successes_total/Sample_size), width = 500) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Average success proportion")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart1_2_a_violins_success_n100_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 50, units = "cm")
+```
+
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Sample_size == 1000,], aes(Model, Successes_total/Sample_size), width = 500) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Average success proportion")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart1_2_b_violins_success_n1000_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 50, units = "cm")
+```
+
+
+# Chart 2 Violins by allocation method, n - 50, 1000
+# n = 50, A Neyman 
+```{r}
+ggplot(data = df2_T2[apply(bind_cols(df2_T2$Sample_size == 50, (df2_T2$Model %in% NeymanModels)), 1, all),], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart2_1_A_violins_SuccessComparison_n50_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+# n = 50, AB RSHIR
+```{r}
+ggplot(data = df2_T2[apply(bind_cols(df2_T2$Sample_size == 50, (df2_T2$Model %in% RSIHRModels)), 1, all),], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart2_1_B_violins_SuccessComparison_n50_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+# n = 50, C Rosenberger 
+```{r}
+ggplot(data = df2_T2[apply(bind_cols(df2_T2$Sample_size == 50, (df2_T2$Model %in% RosenbergerModels)), 1, all),], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart2_1_C_violins_SuccessComparison_n50_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+# n = 50, D OA
+```{r}
+ggplot(data = df2_T2[apply(bind_cols(df2_T2$Sample_size == 50, (df2_T2$Model %in% OAModels)), 1, all),], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart2_1_D_violins_SuccessComparison_n50_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+# n = 50, E Gittins 
+```{r}
+ggplot(data = df2_T2[apply(bind_cols(df2_T2$Sample_size == 50, (df2_T2$Model %in% GittinsModels)), 1, all),], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart2_1_E_violins_SuccessComparison_n50_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+# n = 50, F ML
+```{r}
+ggplot(data = df2_T2[apply(bind_cols(df2_T2$Sample_size == 50, (df2_T2$Model %in% MLModels)), 1, all),], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart2_1_F_violins_SuccessComparison_n50_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+# n = 1000, A Neyman 
+```{r}
+ggplot(data = df2_T2[apply(bind_cols(df2_T2$Sample_size == 1000, (df2_T2$Model %in% NeymanModels)), 1, all),], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart2_1_A_violins_SuccessComparison_n1000_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+# n = 1000, AB RSHIR
+```{r}
+ggplot(data = df2_T2[apply(bind_cols(df2_T2$Sample_size == 1000, (df2_T2$Model %in% RSIHRModels)), 1, all),], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart2_1_B_violins_SuccessComparison_n1000_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+# n = 1000, C Rosenberger 
+```{r}
+ggplot(data = df2_T2[apply(bind_cols(df2_T2$Sample_size == 1000, (df2_T2$Model %in% RosenbergerModels)), 1, all),], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart2_1_C_violins_SuccessComparison_n1000_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+# n = 1000, D OA
+```{r}
+ggplot(data = df2_T2[apply(bind_cols(df2_T2$Sample_size == 1000, (df2_T2$Model %in% OAModels)), 1, all),], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart2_1_D_violins_SuccessComparison_n1000_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+# n = 1000, E Gittins 
+```{r}
+ggplot(data = df2_T2[apply(bind_cols(df2_T2$Sample_size == 1000, (df2_T2$Model %in% GittinsModels)), 1, all),], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart2_1_E_violins_SuccessComparison_n1000_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+# n = 1000, F ML
+```{r}
+ggplot(data = df2_T2[apply(bind_cols(df2_T2$Sample_size == 1000, (df2_T2$Model %in% MLModels)), 1, all),], aes(Model, Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Model") + ylab("Total success proportion")+ scale_y_continuous(labels = scales::percent)
+
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart2_1_F_violins_SuccessComparison_n1000_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+
+# Chart 3 - Average success proportion with sample size - T = 2
+## A Neyman
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, averageSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Total success proprtion average")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart3a_line_avgSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## B RSIHR
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, averageSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Total success proprtion average")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart3b_line_avgSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## C Rosenberger
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, averageSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Total success proprtion average")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart3c_line_avgSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## D Optimally Adjusted
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% OAModels,], aes(Sample_size, averageSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Total success proprtion average")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart3d_line_avgSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## E Gittins
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, averageSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Total success proprtion average")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart3e_line_avgSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+## F ML
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% MLModels,], aes(Sample_size, averageSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Total success proprtion average")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart3f_line_avgSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+# Chart 4 - Change in variance of total successes proportion with sample size - T = 2 
+## A Neyman
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, averageAllocatedA, color = Model)) +geom_line()+xlab("Sample size") + ylab("Average proprtion allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart4a_line_allocatedA_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+## B RSIHR
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, averageAllocatedA, color = Model)) +geom_line()+xlab("Sample size") + ylab("Average proprtion allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart4b_line_allocatedA_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+## C Rosenberger
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, averageAllocatedA, color = Model)) +geom_line()+xlab("Sample size") + ylab("Average proprtion allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart4c_line_allocatedA_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+## D OA
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% OAModels,], aes(Sample_size, averageAllocatedA, color = Model)) +geom_line()+xlab("Sample size") + ylab("Average proprtion allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart4d_line_allocatedA_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+## E Gittins
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, averageAllocatedA, color = Model)) +geom_line()+xlab("Sample size") + ylab("Average proprtion allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart4e_line_allocatedA_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+## F ML
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% MLModels,], aes(Sample_size, averageAllocatedA, color = Model)) +geom_line()+xlab("Sample size") + ylab("Average proprtion allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart4f_line_allocatedA_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+# Chart 5 Chi Sq power with sample size
+## 1. Alpha = 0.05 A Neyman
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1a_ChiSq_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+## 1. Alpha = 0.05 B RSIHR
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1b_ChiSq_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 1. Alpha = 0.05 C Rosenberger
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1c_ChiSq_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 1. Alpha = 0.05 D OA
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% OAModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1d_ChiSq_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 1. Alpha = 0.05 E Gittins
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1e_ChiSq_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 1. Alpha = 0.05 F ML
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% MLModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1f_ChiSq_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+
+
+## 2. Alpha = 0.01 A Neyman
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2a_ChiSq_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+## 2. Alpha = 0.01 B RSIHR
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2b_ChiSq_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 2. Alpha = 0.01 C Rosenberger
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2c_ChiSq_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 2. Alpha = 0.01 D OA
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% OAModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2d_ChiSq_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 2. Alpha = 0.01 E Gittins
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2e_ChiSq_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 2. Alpha = 0.01 F ML
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% MLModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2f_ChiSq_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+# Chart 5 Chi Sq power with sample size
+## 1. Alpha = 0.05 A Neyman
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1a_LR_test_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+## 1. Alpha = 0.05 B RSIHR
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1b_LR_test_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 1. Alpha = 0.05 C Rosenberger
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1c_LR_test_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 1. Alpha = 0.05 D OA
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% OAModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1d_LR_test_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 1. Alpha = 0.05 E Gittins
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1e_LR_test_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 1. Alpha = 0.05 F ML
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% MLModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1f_LR_test_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+
+
+## 2. Alpha = 0.01 A Neyman
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2a_LR_test_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+## 2. Alpha = 0.01 B RSIHR
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2b_LR_test_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 2. Alpha = 0.01 C Rosenberger
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2c_LR_test_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 2. Alpha = 0.01 D OA
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% OAModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2d_LR_test_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 2. Alpha = 0.01 E Gittins
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2e_LR_test_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+
+## 2. Alpha = 0.01 F ML
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% MLModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2f_LR_test_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
+```
+
+# Chart 7 Scatter of power and average success
+## n = 20
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size == 30,], aes(x = averageSuccessProportion , y = ChiSq_005, color = Model, label = Model), width = 200) + geom_point() +xlab("Average total successes") + ylab("Power of ChiSq ar 5% Level of Signifcance")+ scale_y_continuous(labels = scales::percent) + scale_x_continuous(labels = scales::percent) + theme(legend.position = "none")
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart7_a_Scatter_Power_Success_n20_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+
+
+## n = 100
+```{r}
+ggplot(data = df_summary_T2[df_summary_T2$Sample_size == 100,], aes(x = averageSuccessProportion , y = ChiSq_005, color = Model), width = 200) + geom_point() +xlab("Average total successes") + ylab("Power of ChiSq ar 5% Level of Signifcance")+ scale_y_continuous(labels = scales::percent) + scale_x_continuous(labels = scales::percent) + theme(legend.position = "none")
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart7_b_Scatter_Power_Success_n100_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+
+# Chart 8: Distribution of percent of allocation A by sample size - T = 2 
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_Known_RSIHR" & df2_T2$Sample_size %% 100 == 0,], aes(as.factor(Sample_size), Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart8_1_a_Violins_percA_by_sample_size_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_Estimated_RSIHR" & df2_T2$Sample_size %% 100 == 0,], aes(as.factor(Sample_size), Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart8_1_b_Violins_percA_by_sample_size_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_DBCD_RSIHR" & df2_T2$Sample_size %% 100 == 0,], aes(as.factor(Sample_size), Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart8_1_c_Violins_percA_by_sample_size_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_Known_RSIHR" & df2_T2$Sample_size %% 100 == 0,], aes(as.factor(Sample_size), Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("Success proportion")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart8_2_a_Violins_successes_by_sample_size_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_Estimated_RSIHR" & df2_T2$Sample_size %% 100 == 0,], aes(as.factor(Sample_size), Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("Success proportion")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart8_2_b_Violins_successes_by_sample_size_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_DBCD_RSIHR" & df2_T2$Sample_size %% 100 == 0,], aes(as.factor(Sample_size), Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("Success proportion")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart8_2_c_Violins_successes_by_sample_size_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_Known_RSIHR" & df2_T2$Sample_size <= 100,], aes(as.factor(Sample_size), Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart8_1_a_Alt_Violins_percA_by_sample_size_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_Estimated_RSIHR" & df2_T2$Sample_size <= 100,], aes(as.factor(Sample_size), Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart8_1_b_Alt_Violins_percA_by_sample_size_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_DBCD_RSIHR" & df2_T2$Sample_size <= 100,], aes(as.factor(Sample_size), Perc_A), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("% allocated to treatment A")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart8_1_c_Alt_Violins_percA_by_sample_size_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_Known_RSIHR" & df2_T2$Sample_size <= 100,], aes(as.factor(Sample_size), Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("Success  proportion")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart8_2_a_Alt_Violins_successes_by_sample_size_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_Estimated_RSIHR" & df2_T2$Sample_size <= 100,], aes(as.factor(Sample_size), Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("Success  proportion")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart8_2_b_Alt_Violins_successes_by_sample_size_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data = df2_T2[df2_T2$Model == "RA_DBCD_RSIHR" & df2_T2$Sample_size <= 100,], aes(as.factor(Sample_size), Successes_total/Sample_size), width = 200) + geom_violin(scale = "area") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+xlab("Sample size") + ylab("Success  proportion")+ scale_y_continuous(labels = scales::percent)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart8_2_c_Alt_Violins_successes_by_sample_size_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+
+
+
+
+
+
+# Chart 9 - Change in variance of total successes proportion with sample size - T = 2
+```{r}
+ggplot(data =  df_summary_T2[df_summary_T2$Sample_size <=250,], aes(Sample_size, varSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Variance of success proportion") + theme(legend.position="bottom")+ xlim(0, 250) + theme(legend.position = "none")
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart9_all_line_varSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+
+
+```{r}
+ggplot(data =  df_summary_T2[(df_summary_T2$Model %in% NeymanModels) & df_summary_T2$Sample_size <=250,], aes(Sample_size, varSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Variance of success proportion") + theme(legend.position="bottom")+ xlim(0, 250)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart9_a_line_varSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data =  df_summary_T2[(df_summary_T2$Model %in% RSIHRModels) & df_summary_T2$Sample_size <=250,], aes(Sample_size, varSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Variance of success proportion") + theme(legend.position="bottom")+ xlim(0, 250)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart9_b_line_varSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data =  df_summary_T2[(df_summary_T2$Model %in% RosenbergerModels) & df_summary_T2$Sample_size <=250,], aes(Sample_size, varSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Variance of success proportion") + theme(legend.position="bottom")+ xlim(0, 250)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart9_c_line_varSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data =  df_summary_T2[(df_summary_T2$Model %in% OAModels) & df_summary_T2$Sample_size <=250,], aes(Sample_size, varSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Variance of success proportion") + theme(legend.position="bottom")+ xlim(0, 250)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart9_d_line_varSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data =  df_summary_T2[(df_summary_T2$Model %in% GittinsModels) & df_summary_T2$Sample_size <=250,], aes(Sample_size, varSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Variance of success proportion") + theme(legend.position="bottom")+ xlim(0, 250)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart9_e_line_varSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+```{r}
+ggplot(data =  df_summary_T2[(df_summary_T2$Model %in% MLModels) & df_summary_T2$Sample_size <=250,], aes(Sample_size, varSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Variance of success proportion") + theme(legend.position="bottom")+ xlim(0, 250)
+ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart9_f_line_varSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
+```
+
+
+
+
+
+
+
+

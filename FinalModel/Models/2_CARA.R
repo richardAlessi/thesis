@@ -1,4 +1,4 @@
-CARA <- function(Results, n0=3, Z, AllocationMethod, EstimationMethod,  p_known = NULL, gam = NULL){
+CARA <- function(Results, n0=2, Z, AllocationMethod, EstimationMethod,  p_known = NULL, gam = NULL){
   n = dim(Results)[1]
   Tr = dim(Results)[2]
   
@@ -27,8 +27,8 @@ CARA <- function(Results, n0=3, Z, AllocationMethod, EstimationMethod,  p_known 
   }
   
   
-  p = rep(0,T)
-  q = rep(0,T)
+  p = rep(0,Tr)
+  q = rep(0,Tr)
   
   #First initialise by assigning no to each treatment
   Allocation = InitialiseWCovariates_RR(n0, Results, Z)
@@ -47,7 +47,7 @@ CARA <- function(Results, n0=3, Z, AllocationMethod, EstimationMethod,  p_known 
       Z_part = Z[1:(i-1)]
       #All_dummy = dummy_cols(All)
       #All_dummy = All_dummy[,3:(dim(All_dummy)[2])] # Remove first column of original data and first treatment due to multicollinearity
-      glm_res = glm(formula = Res~1+All*Z_part, family = binomial(link="logit"))
+      glm_res = glm(formula = Res~All*Z_part, family = binomial(link="logit"))
       for (j in 1:Tr) {
         # Treatment = rep(0,Tr)
         # Treatment[j] = 1
@@ -75,12 +75,12 @@ CARA <- function(Results, n0=3, Z, AllocationMethod, EstimationMethod,  p_known 
       
  
       if(EstimationMethod == "DBCD"){
-        Pi_allocated = rep(0,T)
-        for (t in 1:Tr) {
-          Pi_allocated[t] = sum(All==t)  
+        Pi_allocated = rep(0,Tr)
+        for (w in 1:Tr) {
+          Pi_allocated[w] = sum(All[Z_part == Z[i]]==w)  
         }
-        Pi_allocated = Pi_allocated/sum(Pi_allocated)
-        p_calc = DBCD_G_Multi(Pi_allocated,p_calc,gam)
+        Pi_allocated_perc = Pi_allocated/sum(Pi_allocated)
+        p_calc = DBCD_G_Multi(Pi_allocated_perc,p_calc,gam)
       }
       Allocation[i] = sample(Tr,1, replace = TRUE, prob = p_calc)
     }

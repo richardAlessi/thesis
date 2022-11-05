@@ -14,6 +14,11 @@ library(fastDummies)
 library(lmtest)
 library(zoo)
 ```
+```{r}
+getwd()
+```
+
+
 
 
 ```{r}
@@ -35,17 +40,17 @@ source("./Models/3_MLMethods.R")
 source("./Models/4_GittinsIndex.R")
 GI = readRDS("C:/Users/richa/Desktop/Thesis/Code/thesis/FinalModel/Helpers/GittinsMatrix.rds")
 
-source("./RunModelFunctions.R")
+source("./RunModelFunctions_T2.R")
 ```
 
 # Set up global simulation parameters
 ```{r}
-runSize = 100 # How often we save results to file
-runRepeats = 3 # Number of times we repeat runSize
+runSize = 80 # How often we save results to file
+runRepeats = 10 # Number of times we repeat runSize
 n_max = 1000 # Total sample size calculated
 n_min = 10
 n_step = 10
-n0 = 3 
+n0 = 2
 
 
 SuccessProbs_List = matrix(data = c(
@@ -61,29 +66,30 @@ params = data.frame(c_gamma = 3,temp = 5,eps = 0.1)
 
 ```{r}
 numCores <- parallel::detectCores() # Requires library(parallel)
-cl = makeCluster(numCores)
-registerDoParallel(cl)
 print(numCores)
 ```
 
 ```{r}
-for (h in dim(SuccessProbs_List)[1]) {
-  SuccessProbs = matrix(SuccessProbs_List[h,], nrow = 2, ncol = 2, byrow = FALSE)
+cl = makeCluster(numCores)
+registerDoParallel(cl)
+
+for (h in 1:(dim(SuccessProbs_List)[1])) {
+#for (h in 1) {
+    SuccessProbs = matrix(SuccessProbs_List[h,], nrow = 2, ncol = 2, byrow = FALSE)
   for(g in 1:runRepeats){
     start_time <- Sys.time()
     resultsCombined = foreach(k = 1:runSize, .combine = rbind) %dopar% {
-      res = runSims(k,  n_max, n_min, n_step, n0, SuccessProbs, params, GI)
+      res = runSims_T2(k,  n_max, n_min, n_step, n0, SuccessProbs, params, GI)
       return(res)
     }
-
     end_time <- Sys.time()
-    write.csv(resultsCombined, file = paste("C:/Users/richa/Desktop/Thesis/FinalResults/Scenario",h ,"_T2_Run",g,"_",format(Sys.time(), "%Y%m%d"),".csv", sep = ""))
-    print(end_time - start_time) 
-  }
+    #g2 = 20+g
+    write.csv(resultsCombined, file = paste("C:/Users/richa/Desktop/Thesis/Results/Scenario",h ,"_T2_Run",g,"_",format(Sys.time(), "%Y%m%d"),".csv", sep = ""))
+  print(end_time - start_time)
+    }
 }
-```
 
-
-```{r}
 stopCluster(cl)
+
 ```
+

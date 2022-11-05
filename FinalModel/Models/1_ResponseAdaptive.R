@@ -1,4 +1,4 @@
-ResponseAdaptive <- function(n, n0 = 5, Results, AllocationMethod, EstimationMethod = NULL,  p_known = NULL, gam = NULL){
+ResponseAdaptive <- function(n, n0 = 2, Results, AllocationMethod, EstimationMethod = NULL,  p_known = NULL, gam = NULL){
   Tr = dim(Results)[2]
   
   if(AllocationMethod == "Random"){Allocation = sample(Tr, n, replace = TRUE)
@@ -73,8 +73,4 @@ ResponseAdaptive <- function(n, n0 = 5, Results, AllocationMethod, EstimationMet
     }
   }
   return(Allocation)
-  
-  
-  
-  
 }
