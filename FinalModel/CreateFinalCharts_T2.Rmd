@@ -27,15 +27,24 @@ library(data.table)
 setwd("C:/Users/richa/Desktop/Thesis/Results")
 scenarioNumber = "1"
 files_T2 = list.files(pattern = paste("Scenario", scenarioNumber,".*T2.*csv", sep = ""))
+files_T2_RPTW = files_T2[grepl("RPTW", files_T2, fixed = TRUE)]
+files_T2 = files_T2[!grepl("RPTW", files_T2, fixed = TRUE)]
+```
 
+```{r}
+setwd("C:/Users/richa/Desktop/Thesis/Results")
 start_time =  Sys.time()
 df_T2 = do.call(rbind, lapply(files_T2, fread))
 end_time =  Sys.time()
 print(end_time - start_time)
+
+df2_T2 = df_T2[df_T2$Model != "RA_ML Model_PlayTheWinnerRandomised", ]
+
+df_RPTW = do.call(rbind, lapply(files_T2_RPTW, fread))
+df2_T2 = rbind(df2_T2, df_RPTW)
 ```
 
 ```{r}
-df2_T2 = df_T2
 df2_T2$Perc_A = df2_T2$Allocation_TreatmentA/df2_T2$Sample_size 
 df2_T2$Power = 1*(df2_T2$ChiSq_pvalue<=0.05)
 ```
@@ -58,14 +67,17 @@ MLModels = c("RA_ML Model_Random", "RA_ML Model_PlayTheWinner", "RA_ML Model_Pla
 n_s = unique(df2_T2$Sample_Size)
 models = unique(df2_T2$Model)
 
-df_summary_T2 <- df2_T2 %>% group_by(Model, Sample_size) %>% summarise(averageSuccessProportion = mean(Successes_total/Sample_size), varSuccessProportion = var(Successes_total/Sample_size), averageAllocatedA = mean(Perc_A), VarAllocatedA = var(Perc_A), averagePower = mean(Power), varPower = var(Power), Z0_avg_all_A = mean(Z0_Allocation_TreatmentA/Sample_size), Z0_avg_successes_A = mean(Z0_Successes_TreatmentA/Sample_size), Z0_avg_successes_B = mean(Z0_Successes_TreatmentB/Sample_size), ChiSq_005 = mean(ifelse(is.na(ChiSq_pvalue),1,ChiSq_pvalue) <= 0.05), ChiSq_001 = mean(ifelse(is.na(ChiSq_pvalue),1,ChiSq_pvalue) <= 0.01), LR_test_005 = mean(ifelse(is.na(LR_test_pvalue),1,LR_test_pvalue) <= 0.05), LR_test_001 = mean(ifelse(is.na(LR_test_pvalue),1,LR_test_pvalue) <= 0.01))
+df_summary_T2 <- df2_T2 %>% group_by(Model, Sample_size) %>% summarise(averageSuccessProportion = mean(Successes_total/Sample_size), varSuccessProportion = var(Successes_total/Sample_size), averageAllocatedA = mean(Perc_A), VarAllocatedA = var(Perc_A), averagePower = mean(Power), varPower = var(Power), Z0_avg_all_A = mean(Z0_Allocation_TreatmentA/Sample_size), Z0_avg_successes_A = mean(Z0_Successes_TreatmentA/Sample_size), Z0_avg_successes_B = mean(Z0_Successes_TreatmentB/Sample_size), ChiSq_005 = mean(ifelse(is.na(ChiSq_pvalue),1,ChiSq_pvalue) <= 0.05), ChiSq_001 = mean(ifelse(is.na(ChiSq_pvalue),1,ChiSq_pvalue) <= 0.01), LR_test_005 = mean(ifelse(is.na(LR_test_pvalue),1,LR_test_pvalue) <= 0.05), LR_test_001 = mean(ifelse(is.na(LR_test_pvalue),1,LR_test_pvalue) <= 0.01), observations = n())
 
-df2_export_1 = df_summary_T2[df_summary_T2$Sample_size %in% c(100,1000),]
-df2_export_2 = df_summary_T2[df_summary_T2$Sample_size <= 100,]
+df2_export_1 = df_summary_T2[df_summary_T2$Sample_size== 100,]
+df2_export_2 = df_summary_T2[df_summary_T2$Sample_size == 1000,]
 ```
 
 ```{r}
-print(xtable(df2_export_1, type = "latex"), file = paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Table_1_n100_1000_summary_Scenario",scenarioNumber,".tex", sep = ""))
+df2_export_1 = select(df2_export_1, Model, P_Success = averageSuccessProportion, Allocated_A = averageAllocatedA, ChiSq = ChiSq_005, LR_test = LR_test_005)
+df2_export_2 = select(df2_export_2, Model, P_Success = averageSuccessProportion, Allocated_A = averageAllocatedA, ChiSq = ChiSq_005, LR_test = LR_test_005)
+print(xtable(df2_export_1, type = "latex"), file = paste("C:/Users/richa/Desktop/Thesis/Images/Tables/Table_1_n100_summary_Scenario",scenarioNumber,".tex", sep = ""))
+print(xtable(df2_export_2, type = "latex"), file = paste("C:/Users/richa/Desktop/Thesis/Images/Tables/Table_2_n1000_summary_Scenario",scenarioNumber,".tex", sep = ""))
 ```
 
 
@@ -264,41 +276,41 @@ ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/C
 # Chart 5 Chi Sq power with sample size
 ## 1. Alpha = 0.05 A Neyman
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1a_ChiSq_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 ## 1. Alpha = 0.05 B RSIHR
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1b_ChiSq_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 1. Alpha = 0.05 C Rosenberger
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1c_ChiSq_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 1. Alpha = 0.05 D OA
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% OAModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% OAModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1d_ChiSq_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 1. Alpha = 0.05 E Gittins
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1e_ChiSq_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 1. Alpha = 0.05 F ML
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% MLModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% MLModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1f_ChiSq_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
@@ -307,41 +319,41 @@ ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/C
 
 ## 2. Alpha = 0.01 A Neyman
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2a_ChiSq_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 ## 2. Alpha = 0.01 B RSIHR
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2b_ChiSq_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 2. Alpha = 0.01 C Rosenberger
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2c_ChiSq_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 2. Alpha = 0.01 D OA
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% OAModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% OAModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2d_ChiSq_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 2. Alpha = 0.01 E Gittins
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2e_ChiSq_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 2. Alpha = 0.01 F ML
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% MLModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% MLModels,], aes(Sample_size, ChiSq_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2f_ChiSq_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
@@ -349,41 +361,41 @@ ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/C
 # Chart 5 Chi Sq power with sample size
 ## 1. Alpha = 0.05 A Neyman
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1a_LR_test_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 ## 1. Alpha = 0.05 B RSIHR
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1b_LR_test_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 1. Alpha = 0.05 C Rosenberger
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1c_LR_test_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 1. Alpha = 0.05 D OA
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% OAModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% OAModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1d_LR_test_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 1. Alpha = 0.05 E Gittins
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1e_LR_test_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 1. Alpha = 0.05 F ML
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% MLModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% MLModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_1f_LR_test_power_005_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
@@ -392,41 +404,41 @@ ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/C
 
 ## 2. Alpha = 0.01 A Neyman
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% NeymanModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2a_LR_test_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 ## 2. Alpha = 0.01 B RSIHR
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% RSIHRModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2b_LR_test_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 2. Alpha = 0.01 C Rosenberger
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% RosenbergerModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2c_LR_test_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 2. Alpha = 0.01 D OA
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% OAModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% OAModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2d_LR_test_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 2. Alpha = 0.01 E Gittins
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% GittinsModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2e_LR_test_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
 
 ## 2. Alpha = 0.01 F ML
 ```{r}
-ggplot(data = df_summary_T2[df_summary_T2$Sample_size <= 250 & df_summary_T2$Model %in% MLModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
+ggplot(data = df_summary_T2[df_summary_T2$Model %in% MLModels,], aes(Sample_size, LR_test_005, color = Model)) +geom_line()+xlab("Sample size") + ylab("Power of CHi Squared test at 5% Level of Significance")+ scale_y_continuous(labels = scales::percent)
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart5_2f_LR_test_power_001_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 20, units = "cm")
 ```
 
@@ -516,7 +528,7 @@ ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/C
 
 # Chart 9 - Change in variance of total successes proportion with sample size - T = 2
 ```{r}
-ggplot(data =  df_summary_T2[df_summary_T2$Sample_size <=250,], aes(Sample_size, varSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Variance of success proportion") + theme(legend.position="bottom")+ xlim(0, 250) + theme(legend.position = "none")
+ggplot(data =  df_summary_T2, aes(Sample_size, varSuccessProportion, color = Model)) +geom_line()+xlab("Sample size") + ylab("Variance of success proportion") + theme(legend.position="bottom")+ xlim(0, 250) + theme(legend.position = "none")
 ggsave(paste("C:/Users/richa/Desktop/Thesis/Images/Scenario_",scenarioNumber,"/Chart9_all_line_varSuccessProp_t2_Scenario_",scenarioNumber,".pdf", sep = ""), device = "pdf", width = 15, units = "cm")
 ```
 

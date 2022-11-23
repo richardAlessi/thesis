@@ -30,7 +30,7 @@ ML_Methods <- function(n0 = 3, Results, Method = "Random", eps = NULL, temp = NU
       p = B/sum(B)
       X = sample(Tr,1, replace = TRUE, prob = p)
       Allocation[i] = X
-      if(Results[i, Tr] == 1){B[X] = B[X]+1 }else{
+      if(Results[i, X] == 1){B[X] = B[X]+1 }else{
         B = B + 1
         B[X] = B[X]-1
       }

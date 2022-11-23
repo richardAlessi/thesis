@@ -37,6 +37,10 @@ print(end_time - start_time)
 ```{r}
 df2_T5 = df_T5
 df2_T5$Perc_A = df2_T5$Allocation_TreatmentA/df2_T5$Sample_size 
+df2_T5$Perc_B = df2_T5$Allocation_TreatmentB/df2_T5$Sample_size 
+df2_T5$Perc_C = df2_T5$Allocation_TreatmentC/df2_T5$Sample_size 
+df2_T5$Perc_D = df2_T5$Allocation_TreatmentD/df2_T5$Sample_size 
+df2_T5$Perc_E = df2_T5$Allocation_TreatmentE/df2_T5$Sample_size 
 df2_T5$Power = 1*(df2_T5$ChiSq_pvalue<=0.05)
 ```
 
@@ -59,10 +63,33 @@ n_s = unique(df2_T5$Sample_Size)
 models = unique(df2_T5$Model)
 df_summary_T5 = data.frame(Sample_size = integer(), Model = character() , averageSuccessProportion = numeric(), varianceSuccessProportion = numeric(), averageAllocatedA = numeric(), varianceAllocatedA = numeric(), averagePower= numeric() )
 
-df_summary_T5 <- df2_T5 %>% group_by(Model, Sample_size) %>% summarise(averageSuccessProportion = mean(Successes_total/Sample_size), varSuccessProportion = var(Successes_total/Sample_size), averageAllocatedA = mean(Perc_A/Sample_size), VarAllocatedA = var(Perc_A/Sample_size), averagePower = mean(Power), varPower = var(Power), ChiSq_005 = mean(ifelse(is.na(ChiSq_pvalue),1,ChiSq_pvalue) <= 0.05), ChiSq_001 = mean(ifelse(is.na(ChiSq_pvalue),1,ChiSq_pvalue) <= 0.01), LR_test_005 = mean(ifelse(is.na(LR_test_pvalue),1,LR_test_pvalue) <= 0.05), LR_test_001 = mean(ifelse(is.na(LR_test_pvalue),1,LR_test_pvalue) <= 0.01))
+df_summary_T5 <- df2_T5 %>% group_by(Model, Sample_size) %>% summarise(averageSuccessProportion = mean(Successes_total/Sample_size), varSuccessProportion = var(Successes_total/Sample_size)
+                                                                       , averageAllocatedA = mean(Perc_A/Sample_size), VarAllocatedA = var(Perc_A/Sample_size)
+                                                                       , averageAllocatedB = mean(Perc_B/Sample_size), VarAllocatedB = var(Perc_B/Sample_size)
+                                                                       , averageAllocatedC = mean(Perc_C/Sample_size), VarAllocatedC = var(Perc_C/Sample_size)
+                                                                       , averageAllocatedD = mean(Perc_D/Sample_size), VarAllocatedD = var(Perc_D/Sample_size)
+                                                                       , averageAllocatedE = mean(Perc_E/Sample_size), VarAllocatedE = var(Perc_E/Sample_size)
+                         , Allocated_Max = max(mean(Perc_A/Sample_size), mean(Perc_B/Sample_size), mean(Perc_C/Sample_size), mean(Perc_D/Sample_size), mean(Perc_E/Sample_size))
+                                                                       , averagePower = mean(Power), varPower = var(Power), ChiSq_005 = mean(ifelse(is.na(ChiSq_pvalue),1,ChiSq_pvalue) <= 0.05), ChiSq_001 = mean(ifelse(is.na(ChiSq_pvalue),1,ChiSq_pvalue) <= 0.01), LR_test_005 = mean(ifelse(is.na(LR_test_pvalue),1,LR_test_pvalue) <= 0.05), LR_test_001 = mean(ifelse(is.na(LR_test_pvalue),1,LR_test_pvalue) <= 0.01))
 
 df_summary_T5
 ```
+
+
+```{r}
+df2_export_1 = df_summary_T5[df_summary_T5$Sample_size== 100,]
+df2_export_2 = df_summary_T5[df_summary_T5$Sample_size == 1000,]
+```
+
+```{r}
+df2_export_1 = select(df2_export_1, Model, P_Success = averageSuccessProportion, Allocated_Max, ChiSq = ChiSq_005, LR_test = LR_test_005)
+df2_export_2 = select(df2_export_2, Model, P_Success = averageSuccessProportion, Allocated_Max, ChiSq = ChiSq_005, LR_test = LR_test_005)
+print(xtable(df2_export_1, type = "latex"), file = paste("C:/Users/richa/Desktop/Thesis/Images/Tables/Table_1_n100_summary_Scenario",scenarioNumber,".tex", sep = ""))
+print(xtable(df2_export_2, type = "latex"), file = paste("C:/Users/richa/Desktop/Thesis/Images/Tables/Table_2_n1000_summary_Scenario",scenarioNumber,".tex", sep = ""))
+```
+
+
+
 
 
 # Chart 1 - Stack bars of treatment allocations, t = 5, 
